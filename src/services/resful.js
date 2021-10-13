@@ -1,27 +1,46 @@
-// import request from 'request'
-// import domain from './domain'
+import axios from 'axios'
+import domain from './domain'
 
+let key = '6e4661923d98478c8adc64491c930451'
 
-// export default {
-//     post: (path, body, headers, proceed) => {
+let url_string = window.location.href
+let url = new URL(url_string);
+let token = url.searchParams.get("access_token");
 
-//         request.post({
-//             url: domain + path,
-//             body: body,
-//             headers: headers,
-//             json: true,
-//         }, function (e, r, b) {
-//             return proceed(e, r, b)
-//         });
-//     },
-//     get: (path, headers, proceed) => {
+export default {
+    post: (path, body, proceed) => {
 
-//         request.get({
-//             url: domain + path,
-//             headers: headers,
-//             json: true,
-//         }, function (e, r, b) {
-//             return proceed(e, r, b)
-//         });
-//     },
-// }
+        axios
+            .post(
+                domain + path,
+                body,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        token,
+                        key
+                    }
+                }
+            )
+            .then(response => {
+                proceed(null, response)
+            })
+            .catch(error => {
+                proceed(error.response)
+            });
+    },
+    chatbox_post: (url, body, proceed) => {
+
+        axios
+            .post(
+                url,
+                body
+            )
+            .then(response => {
+                proceed(null, response)
+            })
+            .catch(error => {
+                proceed(error.response)
+            });
+    }
+}
