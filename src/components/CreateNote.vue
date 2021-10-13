@@ -57,6 +57,7 @@
 
         <!-- Select Calendar -->
         <div class="select-calendar">
+
             <div>
                 <label>Tần suất</label>
                 <select v-model="frequency_selected">             
@@ -68,6 +69,7 @@
                     </option>
                 </select>
             </div>
+
             <div>
                 <label>Chọn thời gian nhắc lịch</label>
                 <date-picker 
@@ -137,22 +139,12 @@
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 import Resful from '@/services/resful.js'
-import dateFormat from 'dateformat'
 
 export default {
     name: "CreateNote",
     components: { DatePicker },
     data() {
         return {
-            tabs: [
-                {
-                    name: 'Tạo mới',
-                },
-                {
-                    name: 'Lịch hẹn đã lên'
-                }
-            ],
-            tab_selected: 'Tạo mới',
             lables : [
                 {
                     name: 'Ghi chú'
@@ -248,7 +240,6 @@ export default {
         }
     },
     mounted() {
-        this.get_note_list()
         
     },
     watch: {
@@ -342,58 +333,10 @@ export default {
                     this.input_content = ''
                     this.date_picker = null
                     this.time_selected = null
-
-                    this.get_note_list()
                 }
             )
         }
-    },
-    filters: {
-        convert_time: function(value) {
-            if(!value) return ''
-            return dateFormat(new Date(value), 'HH:MM - dd/mm/yyyy')
-        },
-        time_more : function(value) {
-
-            if (!value) return '' 
-            if (value < Date.now()) return ''
-
-            var seconds = Math.floor((value - Date.now()) / 1000);
-
-            var interval = seconds / 31536000;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " năm nữa";
-            }
-
-            interval = seconds / 2592000;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " tháng nữa";
-            }
-
-            interval = seconds / 86400;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " ngày nữa";
-            }
-
-            interval = seconds / 3600;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " tiếng nữa";
-            }
-
-            interval = seconds / 60;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " phút nữa";
-            }
-
-            return Math.floor(seconds) + " giây nữa";
-        }
     }
-    
 };
 </script>
 
