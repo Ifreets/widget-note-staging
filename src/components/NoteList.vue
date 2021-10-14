@@ -38,11 +38,11 @@
                             class="text-red text-bold"
                             v-show="item.finished && !item.watched"
                         >
-                            (Chưa xem)
+                            ({{ $t('not_seen') }})
                         </span>
 
                         <span v-show="item.finished && item.watched">
-                            (Đã xem)
+                            ({{ $t('seen') }})
                         </span>
 
                     </span>
@@ -50,7 +50,7 @@
                     <span class="text-green text-bold"
                         v-show="item.finished && item.schedule_time"
                     >
-                        Đã kết thúc
+                        {{ $t('finished') }}
                     </span>
 
                     <span class="text-orange text-bold"
@@ -62,7 +62,7 @@
                     <span class="text-black text-bold"
                         v-show="item.is_remove"
                     >
-                        Xoá lịch
+                        {{ $t('clear_calendar') }}
                     </span>
                     
                 </div>
@@ -170,11 +170,11 @@
                 <div class="btn btn-update label-orange"
                     @click="updateNote()"
                 >
-                    Cập nhật
+                    {{ $t('update') }}
                 </div>
 
                 <div class="btn btn-update label-black" @click="showRemoveNote()">   
-                    Xoá
+                    {{ $t('remove') }}
                 </div>
 
                 
@@ -201,19 +201,19 @@ export default {
             input_content: '',
             time_tabs: [
                 {
-                    name: '30 phút nữa',
+                    name: this.$t('30_minute'),
                     value: '30_minute'
                 },
                 {
-                    name: '2 tiếng nữa',
+                    name: this.$t('2_hours'),
                     value: '2_hours'
                 },
                 {
-                    name: '9:00 ngày mai',
+                    name: this.$t('9:00_tomorrow'),
                     value: '9:00_tomorrow'
                 },
                 {
-                    name: 'Khác',
+                    name: this.$t('other'),
                     value: 'other'
                 },
             ],
@@ -226,19 +226,19 @@ export default {
             show_week_number: true,
             frequency: [
                 {
-                    name : 'Không lặp lại',
+                    name : this.$t('dont_repeat'),
                     value: 'NONE'
                 },
                 {
-                    name : 'Hàng ngày',
+                    name : this.$t('every_day'),
                     value: 'EVERY_DAY'
                 },
                 {
-                    name : 'Hàng Tuần',
+                    name : this.$t('evrery_week'),
                     value: 'EVERY_WEEk'
                 },
                 {
-                    name : 'Hàng tháng',
+                    name : this.$t('every_month'),
                     value: 'EVERY_MONTH'
                 }
             ],
@@ -248,32 +248,26 @@ export default {
             open_modal: false,
             schedule_labels: [
                 {
-                    name: 'Toàn bộ',
+                    name: this.$t('all'),
                     value: ''
                 },
                 {
-                    name: 'Ghi chú',
-                    value: 'Ghi chú'
+                    name: this.$t('note')
                 },
                 {
-                    name: 'Nhắc hẹn',
-                    value: 'Nhắc hẹn'
+                    name: this.$t('appointment_reminder')
                 },
                 {
-                    name: 'Hỗ trợ',
-                    value: 'Hỗ trợ'
+                    name: this.$t('support')
                 },
                 {
-                    name: 'Họp',
-                    value: 'Họp'
+                    name: this.$t('meeting')
                 },
                 {
-                    name: 'Rời văn phòng',
-                    value: 'Rời văn phòng'
+                    name: this.$t('leave_the_office')
                 },
                 {
-                    name: 'Email',
-                    value: 'Email'
+                    name: this.$t('email')
                 },
             ],
             schedule_selected: '',
@@ -447,6 +441,46 @@ export default {
                 }
             )
         }
+    },
+    filters: {
+        time_more: function(value) {
+            if (!value) return '' 
+            if (value < Date.now()) return ''
+
+            var seconds = Math.floor((value - Date.now()) / 1000);
+
+            var interval = seconds / 31536000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('year_more');
+            }
+
+            interval = seconds / 2592000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('month_more');
+            }
+
+            interval = seconds / 86400;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('day_more');
+            }
+
+            interval = seconds / 3600;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('hour_more');
+            }
+
+            interval = seconds / 60;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('minute_more');
+            }
+
+            return Math.floor(seconds) + " " + this.$t('second_more');
+        },
     }
 };
 </script>

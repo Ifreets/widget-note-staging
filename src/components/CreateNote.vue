@@ -2,7 +2,7 @@
     <!-- Create tabs -->
     <div>
         <!-- Label -->
-        <div class="labels">
+        <div class="labels padding-bottom">
             <div v-for="(item, index) in lables" 
                 :key="index" 
                 class="label-primary label-gray"
@@ -20,7 +20,7 @@
                 <div
                     id="content"
                     contenteditable="plaintext-only" 
-                    placeholder="Nhập nội dung ghi chú ..." 
+                    :placeholder="$t('input_content')" 
                     class="chat-input-text"
                     @input="onInput"
                 >
@@ -33,7 +33,7 @@
         <div class="time-select">
 
             <div class="title">
-                Chọn nhanh
+                {{ $t('fast_select') }}
             </div>
 
             <!-- <div class="alert-before">
@@ -59,7 +59,7 @@
         <div class="select-calendar">
 
             <div>
-                <label>Tần suất</label>
+                <label>{{ $t('frequency') }}</label>
                 <select v-model="frequency_selected">             
                     <option 
                         v-for="(item, index) in frequency" :key="index"
@@ -95,13 +95,13 @@
         <div class="button">
 
             <div class="btn btn-script label-black" @click="toogle_modal()">   
-                Kịch bản
+                {{ $t('script') }}
             </div>
 
             <div class="btn btn-save label-orange"
                 @click="create_new_note()"
             >
-                Lưu
+                {{ $t('save') }}
             </div>
         </div>
 
@@ -109,7 +109,7 @@
         <div class="script_modal" v-show="open_modal">
             <div class="header">
                 <div>
-                    Chọn kịch bản trả lời khách hàng tự động
+                    {{ $t('choose_script') }}
                 </div>
                 <img @click="open_modal = false" src="./../assets/close.svg" alt="">
             </div>
@@ -135,7 +135,10 @@
             </div> -->
 
             <div class="script-empty">
-                Chưa có kịch bản, vui lòng truy cập chức năng "<span class="text-bold">Nhăc hẹn</span>" trên máy tính để tạo kịch bản trả lời khách hàng tự động. <span class="text-orange">(Xem hướng dẫn)</span>
+                {{ $t('no_script') }}
+                "<span class="text-bold">{{ $t('appointment_reminder') }}</span>" 
+                {{ $t('on_pc') }} 
+                <span class="text-orange">({{ $t('see_the_instructions') }})</span>
             </div>
 
         </div>
@@ -155,41 +158,41 @@ export default {
         return {
             lables : [
                 {
-                    name: 'Ghi chú'
+                    name: this.$t('note')
                 },
                 {
-                    name: 'Nhắc hẹn'
+                    name: this.$t('appointment_reminder')
                 },
                 {
-                    name: 'Hỗ trợ'
+                    name: this.$t('support')
                 },
                 {
-                    name: 'Họp'
+                    name: this.$t('meeting')
                 },
                 {
-                    name: 'Rời văn phòng'
+                    name: this.$t('leave_the_office')
                 },
                 {
-                    name: 'Email'
+                    name: this.$t('email')
                 },
             ],
-            label_selected: 'Ghi chú',
+            label_selected: this.$t('note'),
             input_content: '',
             time_tabs: [
                 {
-                    name: '30 phút nữa',
+                    name: this.$t('30_minute'),
                     value: '30_minute'
                 },
                 {
-                    name: '2 tiếng nữa',
+                    name: this.$t('2_hours'),
                     value: '2_hours'
                 },
                 {
-                    name: '9:00 ngày mai',
+                    name: this.$t('9:00_tomorrow'),
                     value: '9:00_tomorrow'
                 },
                 {
-                    name: 'Khác',
+                    name: this.$t('other'),
                     value: 'other'
                 },
             ],
@@ -199,56 +202,28 @@ export default {
             type_date_picker: 'datetime',
             time_picker_option: null,
             open_calendar: false,
+            shortcuts: [],
             show_week_number: true,
             frequency: [
                 {
-                    name : 'Không lặp lại',
+                    name : this.$t('dont_repeat'),
                     value: 'NONE'
                 },
                 {
-                    name : 'Hàng ngày',
+                    name : this.$t('every_day'),
                     value: 'EVERY_DAY'
                 },
                 {
-                    name : 'Hàng Tuần',
+                    name : this.$t('evrery_week'),
                     value: 'EVERY_WEEk'
                 },
                 {
-                    name : 'Hàng tháng',
+                    name : this.$t('every_month'),
                     value: 'EVERY_MONTH'
                 }
             ],
             frequency_selected: 'NONE',
-            shortcuts: [],
             open_modal: false,
-            schedule_labels: [
-                {
-                    name: 'Toàn bộ',
-                    value: ''
-                },
-                {
-                    name: 'Ghi chú',
-                    value: 'Ghi chú'
-                },
-                {
-                    name: 'Hỗ trợ',
-                    value: 'Hỗ trợ'
-                },
-                {
-                    name: 'Họp',
-                    value: 'Họp'
-                },
-                {
-                    name: 'Rời văn phòng',
-                    value: 'Rời văn phòng'
-                },
-                {
-                    name: 'Email',
-                    value: 'Email'
-                },
-            ],
-            schedule_selected: 'Toàn bộ',
-            note_list: []
         }
     },
     mounted() {
@@ -340,11 +315,61 @@ export default {
             if(this.open_modal) return this.open_modal = false
             if(!this.open_modal) return this.open_modal = true
         }
+    },
+    filters: {
+
+        time_more: function(value) {
+            if (!value) return '' 
+            if (value < Date.now()) return ''
+
+            var seconds = Math.floor((value - Date.now()) / 1000);
+
+            var interval = seconds / 31536000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('year_more');
+            }
+
+            interval = seconds / 2592000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('month_more');
+            }
+
+            interval = seconds / 86400;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('day_more');
+            }
+
+            interval = seconds / 3600;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('hour_more');
+            }
+
+            interval = seconds / 60;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " " + this.$t('minute_more');
+            }
+
+            return Math.floor(seconds) + " " + this.$t('second_more');
+        },
     }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.labels {
+
+    overflow: auto;
+
+    .label-primary {
+        white-space: nowrap;
+        margin-right: 10px;
+    }
+}
 
 </style>

@@ -36,13 +36,13 @@ export default {
         return {
             tabs: [
                 {
-                    name: 'Tạo mới',
+                    name: this.$t('create_new'),
                 },
                 {
-                    name: 'Lịch hẹn đã lên'
+                    name: this.$t('appointment_scheduled')
                 }
             ],
-            tab_selected: 'Tạo mới',
+            tab_selected: this.$t('create_new')
         }
     }
 };
