@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import dateFormat from 'dateformat'
+import Toasted from 'vue-toasted';
 
 // * Import css
 // import './../libraries/css/normalize.css'
@@ -9,6 +10,8 @@ import dateFormat from 'dateformat'
 import './../libraries/css/custom.scss'
 
 Vue.config.productionTip = false
+
+Vue.use(Toasted)
 
 Vue.filter('convert_time', function (value) {
     if(!value) return ''

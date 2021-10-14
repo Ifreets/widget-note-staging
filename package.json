@@ -13,6 +13,7 @@
     "dateformat": "^5.0.1",
     "lodash": "^4.17.21",
     "vue": "^2.6.11",
+    "vue-toasted": "^1.1.28",
     "vue2-datepicker": "^3.10.2"
   },
   "devDependencies": {

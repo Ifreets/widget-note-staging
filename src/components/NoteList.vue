@@ -54,7 +54,7 @@
                     </span>
 
                     <span class="text-orange text-bold"
-                        v-show="!item.finished && item.schedule_time"
+                        v-show="!item.finished && item.schedule_time && !item.is_remove"
                     >
                         {{item.schedule_time | time_more}}
                     </span>
@@ -146,13 +146,21 @@
                 <div>
                     <label>Chọn thời gian nhắc lịch</label>
                     <date-picker 
-                        class="date-picker" 
-                        v-model="date_picker" 
-                        valueType="timestamp"
-                        :type="type_date_picker"
-                        :shortcuts="shortcuts"
-                    >
-                    </date-picker>
+                    class="date-picker" 
+                    v-model="date_picker" 
+                    valueType="timestamp"
+                    :type="type_date_picker"
+                    :shortcuts="shortcuts"
+                    :format="date_picker_format"
+                    :open.sync="open_calendar"
+                    :time-picker-options="{
+                        start: '00:00',
+                        step: '00:30',
+                        end: '23:30',
+                    }"
+                    :show-week-number="show_week_number"
+                >
+                </date-picker>
                 </div>
             </div>
 
@@ -165,7 +173,7 @@
                     Cập nhật
                 </div>
 
-                <div class="btn btn-update label-black" @click="removeNote()">   
+                <div class="btn btn-update label-black" @click="showRemoveNote()">   
                     Xoá
                 </div>
 
@@ -211,6 +219,11 @@ export default {
             ],
             time_selected: '',
             date_picker: null,
+            date_picker_format: 'HH:mm DD/MM/YYYY',
+            type_date_picker: 'datetime',
+            time_picker_option: null,
+            open_calendar: false,
+            show_week_number: true,
             frequency: [
                 {
                     name : 'Không lặp lại',
@@ -243,6 +256,10 @@ export default {
                     value: 'Ghi chú'
                 },
                 {
+                    name: 'Nhắc hẹn',
+                    value: 'Nhắc hẹn'
+                },
+                {
                     name: 'Hỗ trợ',
                     value: 'Hỗ trợ'
                 },
@@ -272,55 +289,33 @@ export default {
         frequency_selected: function(val) {
             if(val == 'NONE') {
                 this.type_date_picker = 'datetime'
-                this.shortcuts = []
+                this.date_picker_format = 'HH:mm DD/MM/YYYY'
             }
             if(val == 'EVERY_DAY') {
                 this.type_date_picker = 'time'
-                this.shortcuts = []
+                this.date_picker_format = 'HH:mm a'
             }
             if(val == 'EVERY_WEEk') {
-                this.type_date_picker = 'week'
-                this.shortcuts = []
+                this.type_date_picker = 'datetime'
+                this.date_picker_format = 'HH:mm dddd'
             }
             if(val == 'EVERY_MONTH') {
-
-                this.type_date_picker = ''
-
-                this.shortcuts = [
-                {
-                    text: 'Hôm nay',
-                    onClick() {
-                        const date = new Date();
-                        // return a Date
-                        return date;
-                    },
-                },
-                {
-                    text: 'Ngày mai',
-                    onClick() {
-                        const date = new Date();
-                        date.setTime(date.getTime() + 3600 * 1000 * 24);
-                        return date;
-                    },
-                },
-                {
-                    text: 'Ngày kia',
-                    onClick() {
-                        const date = new Date();
-                        date.setTime(date.getTime() + 2 * 3600 * 1000 * 24);
-                        return date;
-                    },
-                },
-            ]
+                this.type_date_picker = 'datetime'
+                this.date_picker_format = 'HH:mm DD/MM/YYYY'
             }
         },
         time_selected(val) {
+
+            this.frequency_selected = 'NONE'
+
             if(val === '30_minute') {
                 this.date_picker = Date.now() + (30 * 60 * 1000)
             }
+
             if(val === '2_hours') {
                 this.date_picker = Date.now() + (2 * 60 * 60 * 1000)
             }
+
             if(val === '9:00_tomorrow') {
 
                 var d = new Date();
@@ -330,7 +325,9 @@ export default {
 
                 this.date_picker = new Date(d).getTime()
             }
+
             if(val === 'other') {
+                this.open_calendar = true
                 this.date_picker = Date.now()
             }
         }
@@ -389,8 +386,34 @@ export default {
 
                     this.is_show_edit = false
                     this.getNoteList()
+
+                    this.$toasted.success("Cập nhật ghi chú thành công",{
+                        duration:5000
+                    });
                 }
             )
+        },
+        showRemoveNote() {
+            this.$toasted.show("Bạn chắc chắn muốn xóa ghi chú này?", {
+                type: "info",
+                theme: "outline",
+                duration: 10000,
+                action: [
+                    {
+                        text: 'Huỷ',
+                        onClick: (e, toastObject) => {
+                            toastObject.goAway(0);
+                        }
+                    },
+                    {
+                        text: 'Xác nhận',
+                        onClick: (e, toastObject) => {
+                            toastObject.goAway(0);
+                            this.removeNote()
+                        }
+                    }
+                ]
+            })
         },
         removeNote() {
 
@@ -430,5 +453,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.labels {
+
+    overflow: auto;
+
+    .label-primary {
+        white-space: nowrap;
+        margin-right: 10px;
+    }
+}
 
 </style>

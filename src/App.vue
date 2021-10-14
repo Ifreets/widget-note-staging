@@ -9,6 +9,10 @@
 import DashBoard from "./components/DashBoard.vue";
 import ActiveWidget from "./components/ActiveWidget.vue"
 
+let url_string = window.location.href
+let url = new URL(url_string);
+let page = url.searchParams.get("page");
+
 export default {
     name: "App",
     components: {
@@ -21,7 +25,7 @@ export default {
         };
     },
     mounted() {
-        if(window.location.pathname === '/active') {
+        if(page === 'active') {
             this.active_app = true
         }
     },

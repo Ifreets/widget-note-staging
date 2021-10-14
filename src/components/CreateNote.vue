@@ -78,6 +78,14 @@
                     valueType="timestamp"
                     :type="type_date_picker"
                     :shortcuts="shortcuts"
+                    :format="date_picker_format"
+                    :open.sync="open_calendar"
+                    :time-picker-options="{
+                        start: '00:00',
+                        step: '00:30',
+                        end: '23:30',
+                    }"
+                    :show-week-number="show_week_number"
                 >
                 </date-picker>
             </div>
@@ -86,7 +94,7 @@
         <!-- Button  -->
         <div class="button">
 
-            <div class="btn btn-script label-black" @click="open_modal = true">   
+            <div class="btn btn-script label-black" @click="toogle_modal()">   
                 Kịch bản
             </div>
 
@@ -187,6 +195,11 @@ export default {
             ],
             time_selected: '',
             date_picker: null,
+            date_picker_format: 'HH:mm DD/MM/YYYY',
+            type_date_picker: 'datetime',
+            time_picker_option: null,
+            open_calendar: false,
+            show_week_number: true,
             frequency: [
                 {
                     name : 'Không lặp lại',
@@ -207,7 +220,6 @@ export default {
             ],
             frequency_selected: 'NONE',
             shortcuts: [],
-            type_date_picker: 'datetime',
             open_modal: false,
             schedule_labels: [
                 {
@@ -240,61 +252,42 @@ export default {
         }
     },
     mounted() {
-        
+       
     },
     watch: {
         frequency_selected: function(val) {
             if(val == 'NONE') {
                 this.type_date_picker = 'datetime'
-                this.shortcuts = []
+                this.date_picker_format = 'HH:mm DD/MM/YYYY'
             }
             if(val == 'EVERY_DAY') {
                 this.type_date_picker = 'time'
-                this.shortcuts = []
+                this.date_picker_format = 'HH:mm a'
+                this.date_picker = Date.now()
             }
             if(val == 'EVERY_WEEk') {
-                this.type_date_picker = 'week'
-                this.shortcuts = []
+                this.type_date_picker = 'datetime'
+                this.date_picker_format = 'HH:mm dddd'
+                this.date_picker = Date.now()
             }
             if(val == 'EVERY_MONTH') {
-
-                this.type_date_picker = ''
-
-                this.shortcuts = [
-                {
-                    text: 'Hôm nay',
-                    onClick() {
-                        const date = new Date();
-                        // return a Date
-                        return date;
-                    },
-                },
-                {
-                    text: 'Ngày mai',
-                    onClick() {
-                        const date = new Date();
-                        date.setTime(date.getTime() + 3600 * 1000 * 24);
-                        return date;
-                    },
-                },
-                {
-                    text: 'Ngày kia',
-                    onClick() {
-                        const date = new Date();
-                        date.setTime(date.getTime() + 2 * 3600 * 1000 * 24);
-                        return date;
-                    },
-                },
-            ]
+                this.type_date_picker = 'datetime'
+                this.date_picker_format = 'HH:mm DD/MM/YYYY'
+                this.date_picker = Date.now()
             }
         },
         time_selected(val) {
+
+            this.frequency_selected = 'NONE'
+
             if(val === '30_minute') {
                 this.date_picker = Date.now() + (30 * 60 * 1000)
             }
+
             if(val === '2_hours') {
                 this.date_picker = Date.now() + (2 * 60 * 60 * 1000)
             }
+
             if(val === '9:00_tomorrow') {
 
                 var d = new Date();
@@ -304,7 +297,9 @@ export default {
 
                 this.date_picker = new Date(d).getTime()
             }
+
             if(val === 'other') {
+                this.open_calendar = true
                 this.date_picker = Date.now()
             }
         }
@@ -329,12 +324,21 @@ export default {
                 },
                 (e, r) => {
                     if(e) return console.log(e)
+
                     document.getElementById('content').innerHTML = "";
                     this.input_content = ''
                     this.date_picker = null
                     this.time_selected = null
+
+                    this.$toasted.success("Tạo ghi chú thành công",{
+                        duration:5000
+                    });
                 }
             )
+        },
+        toogle_modal() {
+            if(this.open_modal) return this.open_modal = false
+            if(!this.open_modal) return this.open_modal = true
         }
     }
 };
