@@ -38,9 +38,9 @@ export default {
     'hour_more': 'more hours',
     'minute_more': 'more minutes',
     'second_more': 'more seconds',
-    'create_new_success': "Tạo ghi chú thành công",
-    'update_sucess': 'Cập nhật ghi chú thành công',
-    'question_remove': 'Bạn chắc chắn muốn xóa ghi chú này?',
-    'cancel': 'Huỷ',
-    'confirm': 'Xác nhận'
+    'create_new_success': "Successful note creation.",
+    'update_sucess': 'Update notes successfully.',
+    'question_remove': 'Are you sure you want to delete this note?',
+    'cancel': 'Cancel',
+    'confirm': 'Confirm'
 }
