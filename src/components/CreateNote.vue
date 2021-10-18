@@ -321,47 +321,6 @@ export default {
             if(this.open_modal) return this.open_modal = false
             if(!this.open_modal) return this.open_modal = true
         }
-    },
-    filters: {
-
-        time_more: function(value) {
-            if (!value) return '' 
-            if (value < Date.now()) return ''
-
-            var seconds = Math.floor((value - Date.now()) / 1000);
-
-            var interval = seconds / 31536000;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " " + this.$t('year_more');
-            }
-
-            interval = seconds / 2592000;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " " + this.$t('month_more');
-            }
-
-            interval = seconds / 86400;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " " + this.$t('day_more');
-            }
-
-            interval = seconds / 3600;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " " + this.$t('hour_more');
-            }
-
-            interval = seconds / 60;
-
-            if (interval > 1) {
-                return Math.floor(interval) + " " + this.$t('minute_more');
-            }
-
-            return Math.floor(seconds) + " " + this.$t('second_more');
-        },
     }
 };
 </script>

@@ -56,7 +56,8 @@
                     <span class="text-orange text-bold"
                         v-show="!item.finished && item.schedule_time && !item.is_remove"
                     >
-                        {{item.schedule_time | time_more}}
+                        <!-- {{item.schedule_time | time_more}} -->
+                        {{ showTimeMore(item.schedule_time) }}
                     </span>
 
                     <span class="text-black text-bold"
@@ -457,10 +458,8 @@ export default {
                     if(e) return console.log(e)
                 }
             )
-        }
-    },
-    filters: {
-        time_more: function(value) {
+        },
+        showTimeMore(value) {
             if (!value) return '' 
             if (value < Date.now()) return ''
 
@@ -497,7 +496,7 @@ export default {
             }
 
             return Math.floor(seconds) + " " + this.$t('second_more');
-        },
+        }
     }
 };
 </script>
