@@ -245,7 +245,8 @@ export default {
             schedule_selected: '',
             note_list: [],
             item_edit: {},
-            is_show_edit: false
+            is_show_edit: false,
+            access_token: ''
         }
     },
     mounted() {
@@ -306,16 +307,17 @@ export default {
             }
         },
         getNoteList() {
-
             let body = {
                 label: this.schedule_selected
             }
-
             if (!body.label) delete body.label
 
             Resful.post(
-                '/v1/note/read',
-                body,
+                {
+                    access_token: this.access_token,
+                    body,
+                    path: '/v1/note/read'
+                },
                 (e, r) => {
 
                     if (e) return console.log(e)
@@ -351,13 +353,16 @@ export default {
             if (!this.input_content) return
 
             Resful.post(
-                '/v1/note/update',
                 {
-                    "_id": this.item_edit._id,
-                    "label": this.label_selected,
-                    "content": this.input_content,
-                    "schedule_time": this.date_picker,
-                    "frequency": this.frequency_selected
+                    access_token: this.access_token,
+                    body: {
+                        "_id": this.item_edit._id,
+                        "label": this.label_selected,
+                        "content": this.input_content,
+                        "schedule_time": this.date_picker,
+                        "frequency": this.frequency_selected
+                    },
+                    path: '/v1/note/update'
                 },
                 (e, r) => {
                     if (e) return console.log(e)
@@ -400,10 +405,13 @@ export default {
         removeNote() {
 
             Resful.post(
-                '/v1/note/update',
                 {
-                    "_id": this.item_edit._id,
-                    "is_remove": true
+                    access_token: this.access_token,
+                    body: {
+                        "_id": this.item_edit._id,
+                        "is_remove": true
+                    },
+                    path: '/v1/note/update'
                 },
                 (e, r) => {
                     if (e) return console.log(e)
@@ -419,10 +427,13 @@ export default {
         },
         watchNote() {
             Resful.post(
-                '/v1/note/update',
                 {
-                    "_id": this.item_edit._id,
-                    "watched": true
+                    access_token: this.access_token,
+                    body: {
+                        "_id": this.item_edit._id,
+                        "watched": true
+                    },
+                    path: '/v1/note/update'
                 },
                 (e, r) => {
                     if (e) return console.log(e)
@@ -468,9 +479,36 @@ export default {
             return Math.floor(seconds) + " " + this.$t('second_more');
         },
         listenParentEvent() {
-            window.addEventListener('message', function (event) {
-                console.log("Message received from the parent: ", event.data); // Message received from parent
-            });
+            try {
+                
+                // * Lắng nghe event message từ parent
+                window.addEventListener('message', function (event) {
+                    if (event &&
+                        event.data &&
+                        event.data.type &&
+                        event.data.from &&
+                        event.data.from === 'CHATBOX' &&
+                        event.data.payload
+                    ) {
+                        // * Phân loại event type
+                        switch (event.data.type) {
+                            case 'RELOAD':
+
+                                // * Ghi đè lại access_token
+                                this.access_token = event.data.payload[
+                                    'access_token'
+                                ] || ''
+
+                                // * Lấy danh sách note mới
+                                this.getNoteList()
+
+                                break;
+                            default: console.log("EVENT_TYPE_INVALID")
+                                break;
+                        }
+                    }
+                });
+            } catch (error) { console.log("listenParentEvent", error) }
         }
     }
 };
