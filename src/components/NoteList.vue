@@ -469,7 +469,7 @@ export default {
         },
         listenParentEvent() {
             window.addEventListener('message', function (event) {
-                console.log("Message received from the parent: ", event, event.data); // Message received from parent
+                console.log("Message received from the parent: ", event.data); // Message received from parent
             });
         }
     }
