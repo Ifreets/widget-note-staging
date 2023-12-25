@@ -1,51 +1,37 @@
 <template>
-
     <div>
         <!-- Label -->
         <div class="labels padding-bottom">
-            <div v-for="(item, index) in schedule_labels" 
-                :key="index" 
-                class="label-primary label-gray"
-                :class="{'label-black': item.value === schedule_selected}"
-                @click="schedule_selected = item.value, getNoteList()"
-            >
-                <span class="text-vertical-center">{{item.name}}</span>
+            <div v-for="(item, index) in schedule_labels" :key="index" class="label-primary label-gray"
+                :class="{ 'label-black': item.value === schedule_selected }"
+                @click="schedule_selected = item.value, getNoteList()">
+                <span class="text-vertical-center">{{ item.name }}</span>
             </div>
         </div>
 
         <div class="body-schedule-list" v-show="!is_show_edit">
 
-            <div class="schedule-list" 
-                v-for="(item, index) in note_list"
-                :key="index"
-                @click="showEdit(item)"
-            >
+            <div class="schedule-list" v-for="(item, index) in note_list" :key="index" @click="showEdit(item)">
                 <div class="staff-avatar">
 
-                    <div 
-                        class="staff-info" 
-                        v-if="item.fb_staff_id"
-                    >
+                    <div class="staff-info" v-if="item.fb_staff_id">
                         <img :src="item.avatar">
                     </div>
 
                 </div>
-                
+
                 <div class="note-content">
 
                     <div class="time">
-                        <span :class="{'time-number': !item.finished && item.schedule_time }">
+                        <span :class="{ 'time-number': !item.finished && item.schedule_time }">
 
-                            <span v-if="item.staff_name"> 
-                                {{ item.staff_name }} - 
-                            </span>  
-                            
-                            {{item.createdAt | convert_time}} 
+                            <span v-if="item.staff_name">
+                                {{ item.staff_name }} -
+                            </span>
 
-                            <span 
-                                class="text-red text-bold"
-                                v-show="item.finished && !item.watched"
-                            >
+                            {{ item.createdAt | convert_time }}
+
+                            <span class="text-red text-bold" v-show="item.finished && !item.watched">
                                 ({{ $t('not_seen') }})
                             </span>
 
@@ -55,38 +41,31 @@
 
                         </span>
 
-                        <span class="text-green text-bold"
-                            v-show="item.finished && item.schedule_time"
-                        >
+                        <span class="text-green text-bold" v-show="item.finished && item.schedule_time">
                             {{ $t('finished') }}
                         </span>
 
                         <span class="text-orange text-bold"
-                            v-show="!item.finished && item.schedule_time && !item.is_remove"
-                        >
+                            v-show="!item.finished && item.schedule_time && !item.is_remove">
                             <!-- {{item.schedule_time | time_more}} -->
                             {{ showTimeMore(item.schedule_time) }}
                         </span>
 
-                        <span class="text-black text-bold"
-                            v-show="item.is_remove"
-                        >
+                        <span class="text-black text-bold" v-show="item.is_remove">
                             {{ $t('clear_calendar') }}
                         </span>
-                        
+
                     </div>
 
                     <div class="content">
                         <div class="label-primary label-gray">
                             <span>
-                                {{item.label}}
+                                {{ item.label }}
                             </span>
                         </div>
                         <div class="schedule-content">
-                            <p
-                                :class="{ 'line-through': item.finished, 'text-red': !item.watched && item.finished }"
-                            >
-                                {{item.content}}
+                            <p :class="{ 'line-through': item.finished, 'text-red': !item.watched && item.finished }">
+                                {{ item.content }}
                             </p>
                         </div>
                     </div>
@@ -101,13 +80,8 @@
             <div class="input-content">
 
                 <div class="input-flex">
-                    <div
-                        id="content"
-                        contenteditable="plaintext-only" 
-                        placeholder="Nhập nội dung ghi chú ..." 
-                        class="chat-input-text"
-                        @input="onInput"
-                    >
+                    <div id="content" contenteditable="plaintext-only" placeholder="Nhập nội dung ghi chú ..."
+                        class="chat-input-text" @input="onInput">
                     </div>
                 </div>
 
@@ -129,13 +103,9 @@
 
             <!-- Time label -->
             <div class="time-labels">
-                <div v-for="(item, index) in time_tabs" 
-                    :key="index" 
-                    class="label-primary"
-                    :class="{'label-orange': item.value === time_selected}"
-                    @click="time_selected = item.value"
-                >
-                    <span class="text-vertical-center">{{item.name}}</span>
+                <div v-for="(item, index) in time_tabs" :key="index" class="label-primary"
+                    :class="{ 'label-orange': item.value === time_selected }" @click="time_selected = item.value">
+                    <span class="text-vertical-center">{{ item.name }}</span>
                 </div>
             </div>
 
@@ -144,57 +114,42 @@
 
                 <div>
                     <label>Tần suất</label>
-                    <select v-model="frequency_selected">             
-                        <option 
-                            v-for="(item, index) in frequency" :key="index"
-                            :value="item.value"
-                        >
-                            {{item.name}}
+                    <select v-model="frequency_selected">
+                        <option v-for="(item, index) in frequency" :key="index" :value="item.value">
+                            {{ item.name }}
                         </option>
                     </select>
                 </div>
 
                 <div>
                     <label>Chọn thời gian nhắc lịch</label>
-                    <date-picker 
-                    class="date-picker" 
-                    v-model="date_picker" 
-                    valueType="timestamp"
-                    :type="type_date_picker"
-                    :shortcuts="shortcuts"
-                    :format="date_picker_format"
-                    :open.sync="open_calendar"
-                    :time-picker-options="{
-                        start: '00:00',
-                        step: '00:30',
-                        end: '23:30',
-                    }"
-                    :show-week-number="show_week_number"
-                >
-                </date-picker>
+                    <date-picker class="date-picker" v-model="date_picker" valueType="timestamp" :type="type_date_picker"
+                        :shortcuts="shortcuts" :format="date_picker_format" :open.sync="open_calendar" :time-picker-options="{
+                            start: '00:00',
+                            step: '00:30',
+                            end: '23:30',
+                        }" :show-week-number="show_week_number">
+                    </date-picker>
                 </div>
             </div>
 
             <!-- Button  -->
             <div class="button">
 
-                <div class="btn btn-update label-orange"
-                    @click="updateNote()"
-                >
+                <div class="btn btn-update label-orange" @click="updateNote()">
                     {{ $t('update') }}
                 </div>
 
-                <div class="btn btn-update label-black" @click="showRemoveNote()">   
+                <div class="btn btn-update label-black" @click="showRemoveNote()">
                     {{ $t('remove') }}
                 </div>
 
-                
+
             </div>
 
         </div>
 
     </div>
-
 </template>
 
 <script>
@@ -204,7 +159,7 @@ import Resful from '@/services/resful.js'
 
 export default {
     name: "DashBoard",
-    components: { 
+    components: {
         DatePicker,
     },
     data() {
@@ -237,19 +192,19 @@ export default {
             show_week_number: true,
             frequency: [
                 {
-                    name : this.$t('dont_repeat'),
+                    name: this.$t('dont_repeat'),
                     value: 'NONE'
                 },
                 {
-                    name : this.$t('every_day'),
+                    name: this.$t('every_day'),
                     value: 'EVERY_DAY'
                 },
                 {
-                    name : this.$t('evrery_week'),
+                    name: this.$t('evrery_week'),
                     value: 'EVERY_WEEk'
                 },
                 {
-                    name : this.$t('every_month'),
+                    name: this.$t('every_month'),
                     value: 'EVERY_MONTH'
                 }
             ],
@@ -295,22 +250,23 @@ export default {
     },
     mounted() {
         this.getNoteList()
+        this.listenParentEvent()
     },
     watch: {
-        frequency_selected: function(val) {
-            if(val == 'NONE') {
+        frequency_selected: function (val) {
+            if (val == 'NONE') {
                 this.type_date_picker = 'datetime'
                 this.date_picker_format = 'HH:mm DD/MM/YYYY'
             }
-            if(val == 'EVERY_DAY') {
+            if (val == 'EVERY_DAY') {
                 this.type_date_picker = 'time'
                 this.date_picker_format = 'HH:mm a'
             }
-            if(val == 'EVERY_WEEk') {
+            if (val == 'EVERY_WEEk') {
                 this.type_date_picker = 'datetime'
                 this.date_picker_format = 'HH:mm dddd'
             }
-            if(val == 'EVERY_MONTH') {
+            if (val == 'EVERY_MONTH') {
                 this.type_date_picker = 'datetime'
                 this.date_picker_format = 'HH:mm DD/MM/YYYY'
             }
@@ -319,15 +275,15 @@ export default {
 
             this.frequency_selected = 'NONE'
 
-            if(val === '30_minute') {
+            if (val === '30_minute') {
                 this.date_picker = Date.now() + (30 * 60 * 1000)
             }
 
-            if(val === '2_hours') {
+            if (val === '2_hours') {
                 this.date_picker = Date.now() + (2 * 60 * 60 * 1000)
             }
 
-            if(val === '9:00_tomorrow') {
+            if (val === '9:00_tomorrow') {
 
                 var d = new Date();
                 d.setDate(d.getDate() + 1);
@@ -337,7 +293,7 @@ export default {
                 this.date_picker = new Date(d).getTime()
             }
 
-            if(val === 'other') {
+            if (val === 'other') {
                 this.open_calendar = true
                 this.date_picker = Date.now()
             }
@@ -345,7 +301,7 @@ export default {
     },
     methods: {
         onInput(e) {
-            if(e && e.target && e.target.innerText) {
+            if (e && e.target && e.target.innerText) {
                 this.input_content = e.target.innerText
             }
         },
@@ -355,24 +311,24 @@ export default {
                 label: this.schedule_selected
             }
 
-            if(!body.label) delete body.label
+            if (!body.label) delete body.label
 
             Resful.post(
                 '/v1/note/read',
                 body,
                 (e, r) => {
-                    
-                    if(e) return console.log(e)
+
+                    if (e) return console.log(e)
 
                     this.note_list = r.data.data.map(item => {
 
                         this.schedule_labels.map(item1 => {
-                            if(item.label === item1.value) {
+                            if (item.label === item1.value) {
                                 item.label = item1.name
                             }
                         })
 
-                        if(item.fb_staff_id) {
+                        if (item.fb_staff_id) {
                             item.avatar = `https://graph.facebook.com/${item.fb_staff_id}/picture`
                         }
 
@@ -392,19 +348,19 @@ export default {
         },
         updateNote() {
 
-            if(!this.input_content) return
+            if (!this.input_content) return
 
             Resful.post(
                 '/v1/note/update',
                 {
-                    "_id" : this.item_edit._id,
+                    "_id": this.item_edit._id,
                     "label": this.label_selected,
                     "content": this.input_content,
                     "schedule_time": this.date_picker,
-                    "frequency" : this.frequency_selected
+                    "frequency": this.frequency_selected
                 },
                 (e, r) => {
-                    if(e) return console.log(e)
+                    if (e) return console.log(e)
                     document.getElementById('content').innerHTML = "";
                     this.input_content = ''
                     this.date_picker = null
@@ -413,8 +369,8 @@ export default {
                     this.is_show_edit = false
                     this.getNoteList()
 
-                    this.$toasted.success(this.$t('update_sucess'),{
-                        duration:5000
+                    this.$toasted.success(this.$t('update_sucess'), {
+                        duration: 5000
                     });
                 }
             )
@@ -446,11 +402,11 @@ export default {
             Resful.post(
                 '/v1/note/update',
                 {
-                    "_id" : this.item_edit._id,
+                    "_id": this.item_edit._id,
                     "is_remove": true
                 },
                 (e, r) => {
-                    if(e) return console.log(e)
+                    if (e) return console.log(e)
                     document.getElementById('content').innerHTML = "";
                     this.input_content = ''
                     this.date_picker = null
@@ -465,16 +421,16 @@ export default {
             Resful.post(
                 '/v1/note/update',
                 {
-                    "_id" : this.item_edit._id,
+                    "_id": this.item_edit._id,
                     "watched": true
                 },
                 (e, r) => {
-                    if(e) return console.log(e)
+                    if (e) return console.log(e)
                 }
             )
         },
         showTimeMore(value) {
-            if (!value) return '' 
+            if (!value) return ''
             if (value < Date.now()) return ''
 
             var seconds = Math.floor((value - Date.now()) / 1000);
@@ -510,6 +466,11 @@ export default {
             }
 
             return Math.floor(seconds) + " " + this.$t('second_more');
+        },
+        listenParentEvent() {
+            window.addEventListener('message', function (event) {
+                console.log("Message received from the parent: " + event.data); // Message received from parent
+            });
         }
     }
 };
@@ -529,10 +490,10 @@ export default {
 
 .staff-info {
     display: flex;
+
     img {
         border-radius: 100%;
-        width: 30px; 
+        width: 30px;
     }
 }
-
 </style>
