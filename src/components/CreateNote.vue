@@ -319,7 +319,9 @@ export default {
         },
         listenParentEvent() {
             try {
-                
+            
+                const _this = this
+
                 // * Lắng nghe event message từ parent
                 window.addEventListener('message', function (event) {
                     if (event &&
@@ -334,9 +336,14 @@ export default {
                             case 'RELOAD':
 
                                 // * Ghi đè lại access_token
-                                this.access_token = event.data.payload[
+                                _this.access_token = event.data.payload[
                                     'access_token'
                                 ] || ''
+
+                                console.log(
+                                    "this.access_token", 
+                                    _this.access_token
+                                )
 
                                 break;
                             default: console.log("EVENT_TYPE_INVALID")
