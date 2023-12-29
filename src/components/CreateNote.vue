@@ -139,7 +139,7 @@ export default {
             (e, r) => {
                 if (e) return console.log(e)
                 this.staff_data = r.data.data.public_profile
-                this.placeholder = `${$t('input_content')} ${this.staff_data.client_name}`
+                this.placeholder = `${this.$t('input_content')} ${this.staff_data.client_name}`
                 console.log("widget note user info", this.staff_data)
             }
         )
@@ -328,7 +328,7 @@ export default {
                 (e, r) => {
                     if (e) return console.log(e)
                     this.staff_data = r.data.data.public_profile
-                    this.placeholder = `${$t('input_content')} ${this.staff_data.client_name}`
+                    this.placeholder = `${this.$t('input_content')} ${this.staff_data.client_name}`
                     console.log("widget note user info", this.staff_data)
                 }
             )
