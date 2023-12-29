@@ -289,7 +289,7 @@ export default {
 
             Resful.post(
                 {
-                    access_token: window.access_token || '',
+                    access_token: window.access_token || access_token,
                     body: {
                         "label": this.label_selected,
                         "content": this.input_content,
