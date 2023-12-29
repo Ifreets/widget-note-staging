@@ -221,7 +221,7 @@ export default {
             frequency_selected: 'NONE',
             open_modal: false,
             staff_data: {},
-            placeholder: $t('input_content')
+            placeholder: this.$t('input_content')
         }
     },
     mounted() {
