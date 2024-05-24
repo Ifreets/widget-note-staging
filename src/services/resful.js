@@ -8,7 +8,8 @@ let url = new URL(url_string);
 let token = url.searchParams.get("access_token");
 
 export default {
-    post: (path, body, proceed) => {
+    post: (params, proceed) => {
+        const { access_token, path, body } = params
 
         axios
             .post(
@@ -17,7 +18,7 @@ export default {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                        token,
+                        token: access_token ? access_token : token,
                         key
                     }
                 }
