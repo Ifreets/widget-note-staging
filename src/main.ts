@@ -6,6 +6,7 @@ import "./style.css";
 // import "./custom.scss";
 import {loadLanguage} from "./services/language";
 import {loadEnv} from "./services/core/env";
+import {loadApp} from "./services/core/app";
 
 // Vue.config.productionTip = false;
 
@@ -14,7 +15,8 @@ async function startApp() {
   try {
     loadLanguage(APP);
     await loadEnv();
-    WIDGET.load(globalThis.$env.secret_key);
+    WIDGET.load($env.secret_key);
+    loadApp(APP);
     APP.mount("#app");
   } catch (error) {
     console.error("Error starting app:", error);

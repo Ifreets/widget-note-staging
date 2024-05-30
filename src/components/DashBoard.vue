@@ -28,16 +28,32 @@
 <script setup lang="ts">
 //* import library
 import debounce from "lodash/debounce";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 //* import components
 import CreateNote from "./CreateNote.vue";
 import NoteList from "./NoteList.vue";
+import {useCommonStore} from "@/services/stores";
+import WIDGET from "bbh-chatbox-widget-js-sdk";
+
+const commonStore = useCommonStore();
+
+onMounted(async () => {
+  commonStore.data_client = await WIDGET.decodeClient();
+
+  WIDGET.onEvent(async () => {
+    // ghi lại thông tin khách hàng mới
+    commonStore.data_client = await WIDGET.decodeClient();
+  });
+});
 
 /** Nội dung của ghi chú */
 const input_content = ref<string>("");
 
 /** Tab đang được hiển thị */
 const tab_selected = ref<string>("NOTE_LIST");
+
+/** ref tới component CreateNote */
+const create_note = ref<any>(null);
 
 const handleChangeInput = debounce(() => {
   if (input_content.value) return changeTab("CREATE_NEW");
@@ -47,10 +63,9 @@ function changeTab(tab: string) {
   tab_selected.value = tab;
 }
 function handleKeyUp(event: any) {
-  if (event.shiftKey && event.keyCode === 13) {
-    // TODO đang tắt check ts chuyển sang composition API sẽ sửa
-    // @ts-ignore
-    this.$refs?.create_note?.create_new_note();
-  }
+  if (!event.shiftKey || !(event.keyCode === 13)) return;
+  if (!create_note.value) return;
+  // Sử dụng tham chiếu để gọi hàm createNewNote trong component con
+  create_note.value.createNewNote();
 }
 </script>
