@@ -1,8 +1,9 @@
 import { InputRequest } from '@/interface/request'
-
+import { DOMAIN } from '@/services/constant/domain'
+import WIDGET from 'bbh-chatbox-widget-js-sdk'
 /** hàm gọi API */
 export const request = async ({
-  uri,
+  path,
   method,
   json,
   body = {},
@@ -15,13 +16,15 @@ export const request = async ({
       headers = {
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
+        token: WIDGET.access_token || '',
+        key: globalThis.$env.secret_key,
         ...headers,
       }
     }
     //nếu method là GET thì bỏ body
     if (method === 'GET') body = undefined
     //call api
-    let result: any = await fetch(uri, { method, headers, body })
+    let result: any = await fetch(DOMAIN + path, { method, headers, body })
     //chuyển kết quả về json
     if (json) result = await result.json()
     return result

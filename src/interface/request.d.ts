@@ -3,8 +3,8 @@ export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 /** kiểu dữ liệu truyền vào của các request */
 interface InputRequest {
-  /** uri của request */
-  uri: string
+  /** path của request */
+  path: string
   /** phương thức request */
   method: Method
   /** body của request */

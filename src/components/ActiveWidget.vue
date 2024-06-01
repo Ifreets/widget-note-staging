@@ -11,17 +11,19 @@
 
 <script setup lang="ts">
 //* import library
-import WIDGET from "bbh-chatbox-widget-js-sdk";
+import WIDGET from 'bbh-chatbox-widget-js-sdk'
+
 /** hàm oauth widget */
 async function active() {
   try {
-    await WIDGET.oAuth();
-    alert("Kích hoạt thành công");
+    // call API oauth
+    await WIDGET.oAuth()
+    alert('Kích hoạt thành công')
   } catch (error) {
-    alert("Kích hoạt không thành công thành công");
-    console.log("oauth widget", error);
+    alert('Kích hoạt không thành công thành công')
+    console.log('oauth widget', error)
   }
-  window.close();
+  window.close()
 }
 </script>
 

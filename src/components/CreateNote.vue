@@ -56,7 +56,10 @@
     <!-- Button  -->
     <div class="w-full flex gap-2 items-center text-black font-medium">
       <!-- @click="toogle_modal()" -->
-      <div class="w-1/4 text-center cursor-pointer hover:font-bold">
+      <div
+        class="w-1/4 text-center cursor-pointer hover:font-bold"
+        @click="closeCreate()"
+      >
         {{ $t('close') }}
       </div>
       <div
@@ -72,7 +75,7 @@
 
 <script setup lang="ts">
 //* import function
-import { useCommonStore } from '@/services/stores'
+import { useAppStore, useCommonStore } from '@/services/stores'
 
 // * import library
 import { ref, watch } from 'vue'
@@ -81,8 +84,12 @@ import 'vue-datepicker-next/locale/vi'
 
 // * import constant
 import { FREQUENCY } from '@/services/constant/create_note'
-import { Resful } from '@/services/resful.js'
+import { request } from '@/services/request'
+import { Toast } from '@/services/toast'
+import { useI18n } from 'vue-i18n'
 
+//* store
+const appStore = useAppStore()
 const commonStore = useCommonStore()
 // * props
 const props = defineProps({
@@ -90,6 +97,10 @@ const props = defineProps({
   input_content: String,
 })
 
+const $toast = new Toast()
+const { t } = useI18n()
+
+// * emits
 const emit = defineEmits(['update:input_content', 'changeTab'])
 
 /** thời gian nhắc lịch */
@@ -103,24 +114,28 @@ const frequency_selected = ref<string>('NONE')
 /** bật/tắt chế độ nhắc lịch */
 const is_remind = ref<boolean>(false)
 
-// lắng nghe event thay đổi tần suất
+// lắng nghe event thay đổi tần suất để chọn định dạng cho input nhập ngày
 watch(
   () => frequency_selected.value,
   (val: string) => {
+    // không nhắc lại
     if (val == 'NONE') {
       type_date_picker.value = 'datetime'
       date_picker_format.value = 'HH:mm DD/MM/YYYY'
     }
+    // nhắc hàng ngày
     if (val == 'EVERY_DAY') {
       type_date_picker.value = 'time'
       date_picker_format.value = 'HH:mm a'
       date_picker.value = Date.now()
     }
+    //nhắc hàng tuần
     if (val == 'EVERY_WEEk') {
       type_date_picker.value = 'datetime'
       date_picker_format.value = 'HH:mm dddd'
       date_picker.value = Date.now()
     }
+    // nhắt hàng tháng
     if (val == 'EVERY_MONTH') {
       type_date_picker.value = 'datetime'
       date_picker_format.value = 'HH:mm DD/MM/YYYY'
@@ -133,11 +148,24 @@ function toogleRemind() {
   is_remind.value = !is_remind.value
 }
 
-const createNewNote = () => {
-  if (!props.input_content) return
-  Resful.post(
-    {
-      access_token: globalThis.access_token || access_token,
+/** hàm đóng tab tạo mới ghi chú */
+function closeCreate() {
+  emit('update:input_content', '')
+  date_picker.value = null
+  emit('changeTab', 'NOTE_LIST')
+}
+
+/** hàm tạo ghi chú mới */
+async function createNewNote() {
+  try {
+    //bật loading
+    appStore.is_loading = true
+
+    // nếu chưa nhập nội dung ghi chú thì không thực hiện
+    if (!props.input_content) return
+    // call api tạo mới note
+    await request({
+      path: '/v1/note/create',
       body: {
         label: 'note',
         content: props.input_content,
@@ -146,22 +174,24 @@ const createNewNote = () => {
         fb_staff_id: commonStore.data_client?.public_profile?.current_staff_id,
         staff_name: commonStore.data_client?.public_profile?.current_staff_name,
       },
-      path: '/v1/note/create',
-    },
-    (e: any) => {
-      if (e) return console.log(e)
-      let content = document.getElementById('content')
-      if (content) content.innerHTML = ''
-      emit('update:input_content', '')
-      date_picker.value = null
-      emit('changeTab', 'NOTE_LIST')
-      // this.$toasted.success(this.$t("create_new_success"), {
-      //   duration: 1000,
-      // });
-    }
-  )
+      method: 'POST',
+      json: true,
+    })
+
+    //tắt loading
+    appStore.is_loading = false
+    $toast.success(t('create_new_success'), 'right', 'top')
+    //tạo thành công thì clear các input và chuyển sang tab danh sách ghi chú
+    closeCreate()
+  } catch (error) {
+    console.log(error)
+    $toast.error('Tạo thất bại', 'right', 'top')
+    // tắt loading
+    appStore.is_loading = false
+  }
 }
 
+// xuất hàm tạo ghi chú
 defineExpose({ createNewNote })
 </script>
 <style lang="scss">

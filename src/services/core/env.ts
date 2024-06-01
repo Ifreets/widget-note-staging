@@ -15,11 +15,6 @@ export async function currentEnv() {
 }
 
 export async function loadEnv() {
-  // currentEnv((e, r) => {
-  //   globalThis.$env = r.$env;
-  //   globalThis.$node_env = r.$node_env;
-  //   if (e) console.log("loadEnv", e);
-  // });
   let r = await currentEnv()
   if (!r) return
   globalThis.$env = r.$env

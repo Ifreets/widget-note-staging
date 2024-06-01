@@ -2,18 +2,20 @@
   <div id="app">
     <DashBoard v-if="!active_app" />
     <ActiveWidget v-if="active_app" />
+    <Loading type="FULL" v-if="appStore.is_loading" />
   </div>
 </template>
 
 <script setup lang="ts">
 // * import function
-import { useCommonStore } from './services/stores'
+import { useAppStore, useCommonStore } from './services/stores'
 // * import library
 import WIDGET from 'bbh-chatbox-widget-js-sdk'
 import { onMounted, ref } from 'vue'
 // * import component
 import DashBoard from './components/DashBoard.vue'
 import ActiveWidget from './components/ActiveWidget.vue'
+import Loading from './components/Loading.vue'
 
 let url_string = window.location.href
 let url = new URL(url_string)
@@ -22,6 +24,8 @@ globalThis.access_token = url.searchParams.get('access_token')
 /** hàm check active widget */
 const active_app = ref<boolean>(false)
 
+// * store
+const appStore = useAppStore()
 const commonStore = useCommonStore()
 
 onMounted(async () => {

@@ -4,7 +4,7 @@
       class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white"
     >
       <input
-        class="w-full h-14 border rounded-md pb-5 px-3 outline-none text-sm"
+        class="w-full min-h-14 border rounded-md pb-5 px-3 outline-none text-sm"
         v-model="appStore.note_content"
         @input="handleChangeInput"
         :placeholder="'Tạo ghi chú mới...(Nhấn Shift + Enter để tạo nhanh)'"
