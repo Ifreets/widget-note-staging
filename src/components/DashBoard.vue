@@ -5,20 +5,20 @@
     >
       <input
         class="w-full h-14 border rounded-md pb-5 px-3 outline-none text-sm"
-        v-model="input_content"
+        v-model="appStore.note_content"
         @input="handleChangeInput"
         :placeholder="'Tạo ghi chú mới...(Nhấn Shift + Enter để tạo nhanh)'"
         @keyup="handleKeyUp"
       />
 
       <!-- List tabs -->
-      <NoteList v-if="tab_selected === 'NOTE_LIST'" />
+      <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
 
       <!-- Create tabs -->
       <CreateNote
         ref="create_note"
-        v-if="tab_selected === 'CREATE_NEW'"
-        v-model:input_content="input_content"
+        v-if="appStore.tab_selected === 'CREATE_NEW'"
+        v-model:input_content="appStore.note_content"
         @changeTab="changeTab"
       />
     </div>
@@ -27,45 +27,43 @@
 
 <script setup lang="ts">
 //* import library
-import debounce from "lodash/debounce";
-import {onMounted, ref} from "vue";
+import debounce from 'lodash/debounce'
+import { ref } from 'vue'
+import { useAppStore } from '@/services/stores'
+
 //* import components
-import CreateNote from "./CreateNote.vue";
-import NoteList from "./NoteList.vue";
-import {useCommonStore} from "@/services/stores";
-import WIDGET from "bbh-chatbox-widget-js-sdk";
+import CreateNote from './CreateNote.vue'
+import NoteList from './NoteList.vue'
 
-const commonStore = useCommonStore();
-
-onMounted(async () => {
-  commonStore.data_client = await WIDGET.decodeClient();
-
-  WIDGET.onEvent(async () => {
-    // ghi lại thông tin khách hàng mới
-    commonStore.data_client = await WIDGET.decodeClient();
-  });
-});
-
-/** Nội dung của ghi chú */
-const input_content = ref<string>("");
-
-/** Tab đang được hiển thị */
-const tab_selected = ref<string>("NOTE_LIST");
+// stores
+const appStore = useAppStore()
 
 /** ref tới component CreateNote */
-const create_note = ref<any>(null);
+const create_note = ref<any>(null)
 
+/** hàm chuyển tab khi thay đổi nội dung ghi chú */
 const handleChangeInput = debounce(() => {
-  if (input_content.value) return changeTab("CREATE_NEW");
-  changeTab("NOTE_LIST");
-}, 500);
+  // nếu có nội dung ghi chú thi chuyển sang tab tạo ghi chú
+  if (appStore.note_content) return changeTab('CREATE_NEW')
+
+  // nếu không thì chuyển sang tab danh sách ghi chú
+  changeTab('NOTE_LIST')
+}, 500)
+
+/** hàm chuyển tab */
 function changeTab(tab: string) {
-  tab_selected.value = tab;
+  appStore.tab_selected = tab
 }
+
+/** hàm bắt sự kiện nhấn shift + enter để tạo ghi chứ */
 function handleKeyUp(event: any) {
-  if (!event.shiftKey || !(event.keyCode === 13)) return;
-  if (!create_note.value) return;
+  // nếu khong shift + enter thi khong thuc hành
+  if (!event.shiftKey || !(event.keyCode === 13)) return
+
+  // nếu shift + enter và có nội dung ghi chứ thì tạo ghi chú
+  if (!appStore.note_content) return
+
   // Sử dụng tham chiếu để gọi hàm createNewNote trong component con
-  create_note.value.createNewNote();
+  create_note.value.createNewNote()
 }
 </script>

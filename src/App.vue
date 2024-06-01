@@ -6,41 +6,46 @@
 </template>
 
 <script setup lang="ts">
+// * import function
+import { useCommonStore } from './services/stores'
+// * import library
+import WIDGET from 'bbh-chatbox-widget-js-sdk'
+import { onMounted, ref } from 'vue'
+// * import component
 import DashBoard from './components/DashBoard.vue'
 import ActiveWidget from './components/ActiveWidget.vue'
-import { Resful } from './services/resful'
-import { onMounted, ref } from 'vue'
-import WIDGET from 'bbh-chatbox-widget-js-sdk'
 
 let url_string = window.location.href
 let url = new URL(url_string)
 globalThis.access_token = url.searchParams.get('access_token')
-// let secret_key = "0cf5516973a145929ff36d3303183e5f";
-// let secret_key = "dc575a112fc24c35b6c289d0a83ab8e6";
 
 /** hàm check active widget */
-const active_app = ref(false)
+const active_app = ref<boolean>(false)
 
-onMounted(() => {
+const commonStore = useCommonStore()
+
+onMounted(async () => {
+  // hàm kiểm tra xem đã kích hoạt chưa và chuyển đến màn tương ứng
   activeApp()
+  // lắng nghe event từ merchant khi chuyển đoạn chat
+  WIDGET.onEvent(async () => {
+    // ghi lại thông tin khách hàng mới
+    commonStore.data_client = await WIDGET.decodeClient()
+  })
 })
 
 /** hàm active widget */
 async function activeApp() {
-  let secret_key = globalThis.$env?.secret_key
-  let client = await WIDGET.decodeClient()
-  console.log(client)
-  Resful.chatbox_post(
-    'https://chatbox-app.botbanhang.vn/v1/service/partner-authenticate',
-    {
-      access_token: globalThis.access_token,
-      secret_key,
-    },
-    (e: any) => {
-      if (e) return (active_app.value = true)
-      active_app.value = false
-    }
-  )
+  try {
+    /** lấy thông tin của khách hàng */
+    commonStore.data_client = await WIDGET.decodeClient()
+    //nếu thành công thì không cho vào màn kích hoạt
+    active_app.value = false
+  } catch (error) {
+    console.log('activeApp', error)
+    // nếu không lấy thành công thì chuyển sang màn kích hoạt
+    active_app.value = true
+  }
 }
 </script>
 

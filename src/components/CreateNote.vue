@@ -29,16 +29,10 @@
           value-type="timestamp"
           :type="type_date_picker"
           :format="date_picker_format"
-          :show-week-number="show_week_number"
           input-class="w-full border-2 pt-1 pb-1.5 px-3 rounded outline-none placeholder:text-gray-500"
           :confirm="true"
           confirm-text="Xác nhận"
         >
-          <!-- <template #footer>
-            <button class="bg-orange-600 text-white px-2 rounded-md">
-              Chọn
-            </button>
-          </template> -->
         </date-picker>
       </div>
       <div class="col-span-1 flex flex-col gap-1">
@@ -104,12 +98,12 @@ const date_picker = ref<number | null>(Date.now())
 const type_date_picker = ref<string>('datetime')
 /** định dạng thời gian */
 const date_picker_format = ref<string>('HH:mm DD/MM/YYYY')
-const show_week_number = ref<boolean>(true)
 /** tần suất được chọn */
 const frequency_selected = ref<string>('NONE')
 /** bật/tắt chế độ nhắc lịch */
 const is_remind = ref<boolean>(false)
 
+// lắng nghe event thay đổi tần suất
 watch(
   () => frequency_selected.value,
   (val: string) => {
@@ -175,4 +169,21 @@ $namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="
 $default-color: #555;
 $primary-color: #f55600;
 @import 'vue-datepicker-next/scss/index.scss';
+.xmx-date-time {
+  height: calc(100vh - 50px);
+}
+.xmx-calendar-content {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.xmx-table thead {
+  // z-index: 1;
+  background: #ffffff;
+  position: sticky;
+  top: 0;
+}
+.xmx-time-content {
+  max-height: calc(100vh - 85px);
+}
 </style>

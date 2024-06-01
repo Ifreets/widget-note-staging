@@ -1,16 +1,19 @@
-// Import vue
-import { createApp } from 'vue'
-import App from './App.vue'
-import WIDGET from 'bbh-chatbox-widget-js-sdk'
-import './style.css'
-// import "./custom.scss";
+// import function
 import { loadLanguage } from './services/language'
 import { loadEnv } from './services/core/env'
 import { loadApp } from './services/core/app'
 
-// Vue.config.productionTip = false;
+// Import vue
+import { createApp } from 'vue'
+import App from './App.vue'
+import WIDGET from 'bbh-chatbox-widget-js-sdk'
+
+//import css
+import './style.css'
 
 const APP = createApp(App)
+
+/** hàm load các hàm cài đặt */
 async function startApp() {
   try {
     // load i18n
