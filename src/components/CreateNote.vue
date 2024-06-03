@@ -37,9 +37,21 @@
         >
         </date-picker> -->
         <VueDatePicker
-          v-model:value="date_picker"
+          v-model="date_picker"
+          input-class-name="text-sm text-gray-500"
+          calendar-cell-class-name="p-0.5 h-auto"
           teleport-center
-          time-picker-inline
+          :time-picker-inline="type_date_picker === 'datetime'"
+          :time-picker="type_date_picker === 'time'"
+          minutes-grid-increment="1"
+          :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
+          :format-locale="vi"
+          cancel-text="Hủy"
+          select-text="Xác nhận"
+          :min-date="new Date()"
+          :format="
+            date_picker_format === 'custom' ? customFormat : date_picker_format
+          "
         >
         </VueDatePicker>
       </div>
@@ -87,9 +99,7 @@ import { useAppStore, useCommonStore } from '@/services/stores'
 
 // * import library
 import { ref, watch } from 'vue'
-import DatePicker from 'vue-datepicker-next'
-import 'vue-datepicker-next/locale/vi.es'
-
+import { vi } from 'date-fns/locale'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 
@@ -119,11 +129,27 @@ const date_picker = ref<number | null>(Date.now())
 /** kiểu thời gian nhắc lịch  */
 const type_date_picker = ref<string>('datetime')
 /** định dạng thời gian */
-const date_picker_format = ref<string>('HH:mm DD/MM/YYYY')
+const date_picker_format = ref<string>('HH:mm dd/MM/yyyy')
 /** tần suất được chọn */
 const frequency_selected = ref<string>('NONE')
 /** bật/tắt chế độ nhắc lịch */
 const is_remind = ref<boolean>(false)
+
+const dayInWeek = [
+  'Chủ nhật',
+  'Thứ hai',
+  'Thứ ba',
+  'Thứ tư',
+  'Thứ năm',
+  'Thứ sáu',
+  'Thứ bảy',
+]
+
+const customFormat = (date: Date) => {
+  return `${date.getHours()}:${
+    date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+  } ${dayInWeek[date.getDay()]}`
+}
 
 // lắng nghe event thay đổi tần suất để chọn định dạng cho input nhập ngày
 watch(
@@ -132,7 +158,7 @@ watch(
     // không nhắc lại
     if (val == 'NONE') {
       type_date_picker.value = 'datetime'
-      date_picker_format.value = 'HH:mm DD/MM/YYYY'
+      date_picker_format.value = 'HH:mm dd/MM/yyyy'
     }
     // nhắc hàng ngày
     if (val == 'EVERY_DAY') {
@@ -141,15 +167,15 @@ watch(
       date_picker.value = Date.now()
     }
     //nhắc hàng tuần
-    if (val == 'EVERY_WEEk') {
+    if (val == 'EVERY_WEEK') {
       type_date_picker.value = 'datetime'
-      date_picker_format.value = 'HH:mm dddd'
+      date_picker_format.value = 'custom'
       date_picker.value = Date.now()
     }
     // nhắt hàng tháng
     if (val == 'EVERY_MONTH') {
       type_date_picker.value = 'datetime'
-      date_picker_format.value = 'HH:mm DD/MM/YYYY'
+      date_picker_format.value = 'HH:mm dd/MM/yyyy'
       date_picker.value = Date.now()
     }
   }
@@ -175,12 +201,12 @@ async function createNewNote() {
     // nếu chưa nhập nội dung ghi chú thì không thực hiện
     if (!props.input_content) return
     // call api tạo mới note
-    await request({
+    let result = await request({
       path: '/v1/note/create',
       body: {
         label: 'note',
         content: props.input_content,
-        schedule_time: date_picker.value,
+        schedule_time: date_picker.value?.valueOf(),
         frequency: frequency_selected.value,
         fb_staff_id: commonStore.data_client?.public_profile?.current_staff_id,
         staff_name: commonStore.data_client?.public_profile?.current_staff_name,
@@ -188,7 +214,7 @@ async function createNewNote() {
       method: 'POST',
       json: true,
     })
-
+    if (!(result.code === 200)) throw result.message
     //tắt loading
     appStore.is_loading = false
     $toast.success(t('create_new_success'), 'right', 'top')
@@ -206,27 +232,19 @@ async function createNewNote() {
 defineExpose({ createNewNote })
 </script>
 <style lang="scss">
-$namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />
-$default-color: #555;
-$primary-color: #f55600;
-@import 'vue-datepicker-next/scss/index.scss';
 @media screen and (min-width: 768px) {
-  .xmx-date-time {
-    height: 250px;
+  .dp__calendar_header_item {
+    height: auto;
   }
-  .xmx-calendar-content {
-    max-height: 200px;
-    overflow-y: auto;
-    scrollbar-width: thin;
+  .dp__menu_inner {
+    padding-bottom: 0;
   }
-  .xmx-table thead {
-    // z-index: 1;
-    background: #ffffff;
-    position: sticky;
-    top: 0;
+  .dp--year-select,
+  .dp__month_year_select {
+    height: auto;
   }
-  .xmx-time-content {
-    max-height: calc(100vh - 85px);
+  .dp__calendar_row {
+    margin: 0;
   }
 }
 </style>

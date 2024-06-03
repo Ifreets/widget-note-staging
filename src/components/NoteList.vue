@@ -4,9 +4,9 @@
   >
     <div
       class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-xs text-slate-500"
-      v-for="(item, index) in note_list"
+      v-for="(item, index) in appStore.note_list"
       :key="index"
-      v-if="note_list.length"
+      v-if="appStore.note_list.length"
     >
       <div class="flex justify-between">
         <span
@@ -63,7 +63,7 @@
     </div>
     <div
       class="w-full h-60 flex items-center justify-center flex-col"
-      v-if="!note_list.length"
+      v-if="!appStore.note_list.length"
     >
       <img class="w-48" src="./../assets/empty.svg" alt="" />
       <p class="text-gray-600 font-medium mt-2">
@@ -93,7 +93,7 @@ const { t } = useI18n()
 const appStore = useAppStore()
 
 /** danh sách ghi chú */
-const note_list = ref<any>([])
+// const note_list = ref<any>([])
 
 //lấy danh sách khi nhận thông báo từ chatbox
 WIDGET.onEvent(async () => {
@@ -148,7 +148,7 @@ async function getNoteList() {
     //tắt loading
     appStore.is_loading = false
 
-    note_list.value = result.data
+    appStore.note_list = result.data
   } catch (error) {
     console.log('get note list', error)
     //tắt loading
