@@ -19,25 +19,11 @@
           Chọn thời gian
           <span class="text-red-500">*</span>
         </label>
-        <VueDatePicker
-          v-model="date_picker"
-          input-class-name="text-sm text-gray-500"
-          calendar-cell-class-name="p-0.5 h-auto"
-          teleport-center
-          :time-picker-inline="type_date_picker === 'datetime'"
-          :time-picker="type_date_picker === 'time'"
-          minutes-grid-increment="1"
-          :day-names="['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']"
-          :format-locale="vi"
-          cancel-text="Hủy"
-          select-text="Xác nhận"
-          :min-date="new Date()"
-          :format="
-            date_picker_format === 'custom' ? customFormat : date_picker_format
-          "
-          menu-class-name="text-sm"
-        >
-        </VueDatePicker>
+        <CustomDatepicker
+          v-model:date="date_value"
+          v-model:time="time_value"
+          :frequency_selected="frequency_selected"
+        />
       </div>
       <div class="col-span-1 flex flex-col gap-1">
         <label class="text-xs">{{ $t('frequency') }}</label>
@@ -82,16 +68,17 @@
 import { useAppStore, useCommonStore } from '@/services/stores'
 
 // * import library
-import { ref, watch } from 'vue'
-import { vi } from 'date-fns/locale'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
+import { ref } from 'vue'
+
+//* import component
+import CustomDatepicker from '@/components/CustomDatepicker.vue'
 
 // * import constant
 import { FREQUENCY } from '@/services/constant/create_note'
 import { request } from '@/services/request'
 import { Toast } from '@/services/toast'
 import { useI18n } from 'vue-i18n'
+import { timestampToDate } from '@/services/format/date'
 
 //* store
 const appStore = useAppStore()
@@ -107,63 +94,18 @@ const { t } = useI18n()
 
 // * emits
 const emit = defineEmits(['update:input_content', 'changeTab'])
-
-/** thời gian nhắc lịch */
-const date_picker = ref<number | null>(Date.now())
-/** kiểu thời gian nhắc lịch  */
-const type_date_picker = ref<string>('datetime')
-/** định dạng thời gian */
-const date_picker_format = ref<string>('HH:mm dd/MM/yyyy')
 /** tần suất được chọn */
 const frequency_selected = ref<string>('NONE')
 /** bật/tắt chế độ nhắc lịch */
 const is_remind = ref<boolean>(false)
 
-const dayInWeek = [
-  'Chủ nhật',
-  'Thứ hai',
-  'Thứ ba',
-  'Thứ tư',
-  'Thứ năm',
-  'Thứ sáu',
-  'Thứ bảy',
-]
+/** ngày đặt lịch */
+const date_value = ref<number>(new Date().setHours(0, 0, 0, 0))
+const time_value = ref<{ hour: number; minute: number }>({
+  hour: new Date().getHours(),
+  minute: new Date().getMinutes(),
+})
 
-const customFormat = (date: Date) => {
-  return `${date.getHours()}:${
-    date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-  } ${dayInWeek[date.getDay()]}`
-}
-
-// lắng nghe event thay đổi tần suất để chọn định dạng cho input nhập ngày
-watch(
-  () => frequency_selected.value,
-  (val: string) => {
-    // không nhắc lại
-    if (val == 'NONE') {
-      type_date_picker.value = 'datetime'
-      date_picker_format.value = 'HH:mm dd/MM/yyyy'
-    }
-    // nhắc hàng ngày
-    if (val == 'EVERY_DAY') {
-      type_date_picker.value = 'time'
-      date_picker_format.value = 'HH:mm a'
-      date_picker.value = Date.now()
-    }
-    //nhắc hàng tuần
-    if (val == 'EVERY_WEEK') {
-      type_date_picker.value = 'datetime'
-      date_picker_format.value = 'custom'
-      date_picker.value = Date.now()
-    }
-    // nhắt hàng tháng
-    if (val == 'EVERY_MONTH') {
-      type_date_picker.value = 'datetime'
-      date_picker_format.value = 'HH:mm dd/MM/yyyy'
-      date_picker.value = Date.now()
-    }
-  }
-)
 /** hàm bật/tắt nhắc lịch */
 function toogleRemind() {
   is_remind.value = !is_remind.value
@@ -172,8 +114,16 @@ function toogleRemind() {
 /** hàm đóng tab tạo mới ghi chú */
 function closeCreate() {
   emit('update:input_content', '')
-  date_picker.value = null
   emit('changeTab', 'NOTE_LIST')
+}
+
+function getDateTime(hour: number, minute: number, date: number) {
+  let date_temp = new Date(date)
+  let date_string = `${date_temp.getFullYear()}/${
+    date_temp.getMonth() + 1
+  }/${date_temp.getDate()}`
+  let time_string = `${hour}:${minute}`
+  return new Date(date_string + ' ' + time_string).getTime()
 }
 
 /** hàm tạo ghi chú mới */
@@ -190,7 +140,11 @@ async function createNewNote() {
       body: {
         label: 'note',
         content: props.input_content,
-        schedule_time: date_picker.value?.valueOf(),
+        schedule_time: getDateTime(
+          time_value.value.hour,
+          time_value.value.minute,
+          date_value.value
+        ),
         frequency: frequency_selected.value,
         fb_staff_id: commonStore.data_client?.public_profile?.current_staff_id,
         staff_name: commonStore.data_client?.public_profile?.current_staff_name,
@@ -216,17 +170,23 @@ async function createNewNote() {
 defineExpose({ createNewNote })
 </script>
 <style lang="scss">
-.dp__calendar_header_item {
-  height: auto;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
 }
-.dp__menu_inner {
-  padding-bottom: 0;
+/* Track */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
 }
-.dp--year-select,
-.dp__month_year_select {
-  height: auto;
+
+/* Handle */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
 }
-.dp__calendar_row {
-  margin: 0;
+
+/* Handle on hover */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>

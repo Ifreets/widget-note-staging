@@ -9,3 +9,12 @@ export function convertTimeList(value: number) {
   const year = date.getFullYear()
   return `${hours}:${minutes} - ${day}/${month}/${year}`
 }
+
+export function timestampToDate(value: number) {
+  if (!value) return ''
+  const date = new Date(value)
+  const day = ('0' + date.getDate()).slice(-2)
+  const month = ('0' + (date.getMonth() + 1)).slice(-2) // Month is zero-indexed
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
