@@ -3,12 +3,12 @@
     class="body-schedule-list h-full overflow-y-auto scrollbar-thin flex flex-col gap-2"
   >
     <div
-      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-xs text-slate-500"
+      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm text-slate-500"
       v-for="(item, index) in appStore.note_list"
       :key="index"
       v-if="appStore.note_list.length"
     >
-      <div class="flex justify-between">
+      <div class="flex justify-between text-xs">
         <span
           :class="{
             'font-semibold': !item.finished && item.schedule_time,
@@ -47,7 +47,7 @@
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <img :src="CalendarIcon" />
+        <img v-if="item.schedule_time" :src="CalendarIcon" />
         <div>
           <p
             :class="{

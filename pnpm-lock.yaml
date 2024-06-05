@@ -35,9 +35,6 @@ importers:
       vue:
         specifier: ^3.4.21
         version: 3.4.27(typescript@5.4.5)
-      vue-datepicker-next:
-        specifier: ^1.0.3
-        version: 1.0.3(vue@3.4.27(typescript@5.4.5))
       vue-i18n:
         specifier: ^9.13.1
         version: 9.13.1(vue@3.4.27(typescript@5.4.5))
@@ -612,9 +609,6 @@ packages:
 
   date-fns@3.6.0:
     resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
-
-  date-format-parse@0.2.7:
-    resolution: {integrity: sha512-/+lyMUKoRogMuTeOVii6lUwjbVlesN9YRYLzZT/g3TEZ3uD9QnpjResujeEqUW+OSNbT7T1+SYdyEkTcRv+KDQ==}
 
   de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
@@ -1379,11 +1373,6 @@ packages:
       terser:
         optional: true
 
-  vue-datepicker-next@1.0.3:
-    resolution: {integrity: sha512-Brqjh896BJGVxP7d6tGDsPMu0SDAB8hAdtG7zWF8VIHJB21dk1VB9KgdajD9Y9uXbg+wHN0vmL7sbMPIyehQVQ==}
-    peerDependencies:
-      vue: ^3.0.0
-
   vue-demi@0.14.7:
     resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
     engines: {node: '>=12'}
@@ -1924,8 +1913,6 @@ snapshots:
       is-data-view: 1.0.1
 
   date-fns@3.6.0: {}
-
-  date-format-parse@0.2.7: {}
 
   de-indent@1.0.2: {}
 
@@ -2765,11 +2752,6 @@ snapshots:
       '@types/node': 20.12.12
       fsevents: 2.3.3
       sass: 1.77.2
-
-  vue-datepicker-next@1.0.3(vue@3.4.27(typescript@5.4.5)):
-    dependencies:
-      date-format-parse: 0.2.7
-      vue: 3.4.27(typescript@5.4.5)
 
   vue-demi@0.14.7(vue@3.4.27(typescript@5.4.5)):
     dependencies:
