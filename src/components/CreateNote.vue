@@ -139,11 +139,13 @@ async function createNewNote() {
       body: {
         label: 'note',
         content: props.input_content,
-        schedule_time: getDateTime(
-          time_value.value.hour,
-          time_value.value.minute,
-          date_value.value
-        ),
+        schedule_time: is_remind.value
+          ? getDateTime(
+              time_value.value.hour,
+              time_value.value.minute,
+              date_value.value
+            )
+          : null,
         frequency: frequency_selected.value,
         fb_staff_id: commonStore.data_client?.public_profile?.current_staff_id,
         staff_name: commonStore.data_client?.public_profile?.current_staff_name,

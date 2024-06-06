@@ -2,7 +2,7 @@
   <div class="flex gap-1">
     <VueDatePicker
       :disabled="props.frequency_selected === 'EVERY_DAY'"
-      v-model="date_value"
+      v-model="date"
       input-class-name="border-1 outline-none h-full text-sm text-gray-500 px-2 text-center"
       teleport-center
       :enable-time-picker="false"
@@ -49,11 +49,15 @@
                 v-for="item in hours"
                 :key="item"
                 class="cursor-pointer py-1"
-                :class="
-                  item === time_value.hour
-                    ? 'bg-[#ea580c] text-white font-medium active'
-                    : 'hover:bg-gray-200'
-                "
+                :class="{
+                  'bg-[#ea580c] text-white font-medium active':
+                    item === time_value.hour,
+                  'hover:bg-gray-200': item !== time_value.hour,
+                  'pointer-events-none text-gray-200': prevent_pass(
+                    item,
+                    'HOUR'
+                  ),
+                }"
                 @click="time_value.hour = item"
               >
                 {{ item.toString().padStart(2, '0') }}
@@ -66,11 +70,15 @@
                 v-for="item in minutes"
                 :key="item"
                 class="cursor-pointer py-1"
-                :class="
-                  item === time_value.minute
-                    ? 'bg-[#ea580c] text-white font-medium active'
-                    : 'hover:bg-gray-200'
-                "
+                :class="{
+                  'bg-[#ea580c] text-white font-medium active':
+                    item === time_value.minute,
+                  'hover:bg-gray-200': item !== time_value.minute,
+                  'pointer-events-none text-gray-200': prevent_pass(
+                    item,
+                    'MINUTE'
+                  ),
+                }"
                 @click="time_value.minute = item"
               >
                 {{ item.toString().padStart(2, '0') }}
@@ -115,6 +123,8 @@ const date_value = defineModel<number>('date', {
   default: 0,
 })
 
+const date = ref(new Date(date_value.value))
+
 /** thời gian đặt lịch */
 const time_value = defineModel<{ hour: number; minute: number }>('time', {
   default: { hour: 0, minute: 0 },
@@ -142,6 +152,43 @@ const minutes = computed(() => {
   }
   return arr
 })
+
+function prevent_pass(value: number, type: 'HOUR' | 'MINUTE') {
+  if (
+    props.frequency_selected !== 'NONE' ||
+    date.value.valueOf() > new Date().setHours(0, 0, 0, 0)
+  )
+    return false
+  if (type === 'HOUR' && value < new Date().getHours()) return true
+  if (type === 'MINUTE' && value < new Date().getMinutes()) return true
+  return false
+}
+
+/** khi chọn tần suất thì đặt thời gian là hiện tại */
+watch(
+  () => props.frequency_selected,
+  () => {
+    let today = new Date()
+    today.setHours(0, 0, 0, 0)
+    date.value = today
+    time_value.value = {
+      hour: today.getHours(),
+      minute: today.getMinutes(),
+    }
+  }
+)
+/** khi chọn ngày nếu là hôm nay thì đặt giờ là hiện tại */
+watch(
+  () => date.value,
+  (value) => {
+    if (value.valueOf() === new Date().setHours(0, 0, 0, 0))
+      time_value.value = {
+        hour: new Date().getHours(),
+        minute: new Date().getMinutes(),
+      }
+  }
+)
+
 /** khi chọn giờ thì scroll tới */
 watch(
   () => time_value.value.hour,
