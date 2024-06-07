@@ -57,7 +57,7 @@
         :class="props.input_content ? 'bg-orange-600' : 'bg-gray-400'"
         @click="createNewNote()"
       >
-        {{ $t('save') }}
+        {{ appStore.note_index !== -1 ? $t('update') : $t('save') }}
       </div>
     </div>
   </div>
@@ -66,18 +66,18 @@
 <script setup lang="ts">
 //* import function
 import { useAppStore, useCommonStore } from '@/services/stores'
+import { request } from '@/services/request'
 
 // * import library
 import { ref } from 'vue'
+import { Toast } from '@/services/toast'
+import { useI18n } from 'vue-i18n'
 
 //* import component
 import CustomDatepicker from '@/components/CustomDatepicker.vue'
 
 // * import constant
 import { FREQUENCY } from '@/services/constant/create_note'
-import { request } from '@/services/request'
-import { Toast } from '@/services/toast'
-import { useI18n } from 'vue-i18n'
 
 //* store
 const appStore = useAppStore()
@@ -93,17 +93,61 @@ const { t } = useI18n()
 
 // * emits
 const emit = defineEmits(['update:input_content', 'changeTab'])
+
 /** tần suất được chọn */
 const frequency_selected = ref<string>('NONE')
+
 /** bật/tắt chế độ nhắc lịch */
-const is_remind = ref<boolean>(false)
+const is_remind = ref<boolean>(initIsRemind())
 
 /** ngày đặt lịch */
-const date_value = ref<number>(new Date().setHours(0, 0, 0, 0))
-const time_value = ref<{ hour: number; minute: number }>({
-  hour: new Date().getHours(),
-  minute: new Date().getMinutes(),
-})
+const date_value = ref<Date>(initDate())
+const time_value = ref<{ hour: number; minute: number }>(initTime())
+
+/** hàm khởi tạo giá trị cho bật/tắt nhắc lịch */
+function initIsRemind() {
+  // index bằng -1 là đang ở chế độ sửa và có thời gian đặt lịch thì khởi tạo là true
+  if (
+    appStore.note_index !== -1 &&
+    appStore.note_list[appStore.note_index].schedule_time
+  )
+    return true
+  return false
+}
+
+/** hàm khởi tạo giá trị cho ngày đặt lịch */
+function initDate() {
+  // index bằng -1 là đang ở chế độ sửa và có thời gian đặt lịch thì khởi tạo
+  //là thời gian đặt lịch đó
+
+  if (
+    appStore.note_index !== -1 &&
+    appStore.note_list[appStore.note_index].schedule_time
+  ) {
+    return new Date(appStore.note_list[appStore.note_index].schedule_time || 0)
+  }
+
+  return getCurrentDate()
+}
+
+/** hàm khởi tạo giá trị cho thời gian đặt lịch */
+function initTime() {
+  if (
+    appStore.note_index !== -1 &&
+    appStore.note_list[appStore.note_index].schedule_time
+  ) {
+    return {
+      hour: new Date(
+        appStore.note_list[appStore.note_index].schedule_time || 0
+      ).getHours(),
+      minute: new Date(
+        appStore.note_list[appStore.note_index].schedule_time || 0
+      ).getMinutes(),
+    }
+  }
+
+  return { hour: new Date().getHours(), minute: new Date().getMinutes() }
+}
 
 /** hàm bật/tắt nhắc lịch */
 function toogleRemind() {
@@ -114,6 +158,12 @@ function toogleRemind() {
 function closeCreate() {
   emit('update:input_content', '')
   emit('changeTab', 'NOTE_LIST')
+  appStore.note_index = -1
+}
+
+/** hàm lấy ngày hôm nay tại lúc 0 giờ 0 phút 0 giây */
+function getCurrentDate() {
+  return new Date()
 }
 
 function getDateTime(hour: number, minute: number, date: number) {
@@ -122,7 +172,8 @@ function getDateTime(hour: number, minute: number, date: number) {
     date_temp.getMonth() + 1
   }/${date_temp.getDate()}`
   let time_string = `${hour}:${minute}`
-  return new Date(date_string + ' ' + time_string).getTime()
+
+  return new Date(time_string + ' ' + date_string).getTime()
 }
 
 /** hàm tạo ghi chú mới */
@@ -135,15 +186,19 @@ async function createNewNote() {
     if (!props.input_content) return
     // call api tạo mới note
     let result = await request({
-      path: '/v1/note/create',
+      path: appStore.note_index !== -1 ? '/v1/note/update' : '/v1/note/create',
       body: {
+        _id:
+          appStore.note_index !== -1
+            ? appStore.note_list[appStore.note_index]._id
+            : null,
         label: 'note',
         content: props.input_content,
         schedule_time: is_remind.value
           ? getDateTime(
               time_value.value.hour,
               time_value.value.minute,
-              date_value.value
+              date_value.value.setHours(0, 0, 0, 0)
             )
           : null,
         frequency: frequency_selected.value,
@@ -154,9 +209,23 @@ async function createNewNote() {
       json: true,
     })
     if (!(result.code === 200)) throw result.message
+
+    // kiểm tra có phải tạo mới ghi chứ không
+    if (appStore.note_index === -1) {
+      // thêm ghi chú mới tạo vào danh sách ghi chú
+      appStore.note_list = [result.data, ...appStore.note_list]
+    } else {
+      // sửa ghi chú trong danh sách ghi chú
+      appStore.note_list[appStore.note_index] = result.data
+    }
+
     //tắt loading
     appStore.is_loading = false
-    $toast.success(t('create_new_success'), 'right', 'top')
+    $toast.success(
+      appStore.note_index !== -1 ? t('update_sucess') : t('create_new_success'),
+      'right',
+      'top'
+    )
     //tạo thành công thì clear các input và chuyển sang tab danh sách ghi chú
     closeCreate()
   } catch (error) {

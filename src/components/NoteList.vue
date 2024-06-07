@@ -3,29 +3,18 @@
     class="body-schedule-list h-full overflow-y-auto scrollbar-thin flex flex-col gap-2"
   >
     <div
-      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm text-slate-500"
+      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm text-slate-500 cursor-pointer hover:bg-slate-200"
       v-for="(item, index) in appStore.note_list"
       :key="index"
       v-if="appStore.note_list.length"
+      @click="editNote(item, index)"
     >
       <div class="flex justify-between text-xs">
-        <span
-          :class="{
-            'font-semibold': !item.finished && item.schedule_time,
-          }"
-        >
+        <!-- :class="{
+            'font-medium': !item.finished && item.schedule_time,
+          }" -->
+        <span class="font-medium">
           {{ item.createdAt ? convertTimeList(item.createdAt) : '' }}
-
-          <span
-            class="text-red-500 font-semibold"
-            v-show="item.finished && !item.watched"
-          >
-            ({{ $t('not_seen') }})
-          </span>
-
-          <span v-show="item.finished && item.watched">
-            ({{ $t('seen') }})
-          </span>
         </span>
 
         <span
@@ -36,10 +25,10 @@
         </span>
 
         <span
-          class="text-orange-600 font-semibold"
+          class="text-orange-500 font-semibold"
           v-show="!item.finished && item.schedule_time && !item.is_remove"
         >
-          {{ showTimeMore(item.schedule_time) }}
+          {{ item.schedule_time && showTimeMore(item.schedule_time) }}
         </span>
 
         <span class="text-black font-semibold" v-show="item.is_remove">
@@ -52,7 +41,7 @@
           <p
             :class="{
               'line-through': item.finished,
-              'text-red-500': !item.watched && item.finished,
+              // 'text-red-500': !item.watched && item.finished,
             }"
             class="truncate w-60 sm:w-72"
           >
@@ -75,34 +64,20 @@
 
 <script setup lang="ts">
 //* import function
-import { request } from '@/services/request'
 import { convertTimeList } from '@/services/format/date'
 
 //* import library
-import WIDGET from 'bbh-chatbox-widget-js-sdk'
-import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 //* import icon
 import CalendarIcon from '@/assets/calendar.svg'
 import { useAppStore } from '@/services/stores'
+import { INote } from '@/interface/note'
 
 const { t } = useI18n()
 
 // * store
 const appStore = useAppStore()
-
-/** danh sách ghi chú */
-// const note_list = ref<any>([])
-
-//lấy danh sách khi nhận thông báo từ chatbox
-WIDGET.onEvent(async () => {
-  getNoteList()
-})
-onMounted(() => {
-  //lấy danh sách khi bật app
-  getNoteList()
-})
 
 /** hàm chuyển từ khoảng timestamp sang khoảng thời gian ví dụ: 3600 -> 1 giờ */
 function showTimeMore(value: number) {
@@ -131,29 +106,12 @@ function showTimeMore(value: number) {
   }
 }
 
-/** hàm lấy danh sách ghi chú */
-async function getNoteList() {
-  try {
-    //bật loading
-    appStore.is_loading = true
+/** hàm xử lý khi nhấn vào một note để chỉnh sửa */
+function editNote(item: INote, index: number) {
+  appStore.note_content = item.content || ''
+  appStore.note_index = index
 
-    // call api lấy danh sách ghi chú
-    let result = await request({
-      path: '/v1/note/read',
-      body: {},
-      method: 'POST',
-      json: true,
-    })
-
-    //tắt loading
-    appStore.is_loading = false
-
-    appStore.note_list = result.data
-  } catch (error) {
-    console.log('get note list', error)
-    //tắt loading
-    appStore.is_loading = false
-  }
+  appStore.tab_selected = 'CREATE_NEW'
 }
 </script>
 
