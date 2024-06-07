@@ -6,7 +6,6 @@
       <input
         class="w-full min-h-14 border rounded-md pb-5 px-3 outline-none text-sm"
         v-model="appStore.note_content"
-        @input="handleChangeInput"
         :placeholder="'Tạo ghi chú mới...(Nhấn Shift + Enter để tạo nhanh)'"
         @keyup="handleKeyUp"
       />
@@ -26,10 +25,13 @@
 </template>
 
 <script setup lang="ts">
+//* import function
+import { request } from '@/services/request'
+
 //* import library
-import debounce from 'lodash/debounce'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useAppStore } from '@/services/stores'
+import WIDGET from 'bbh-chatbox-widget-js-sdk'
 
 //* import components
 import CreateNote from './CreateNote.vue'
@@ -41,12 +43,14 @@ const appStore = useAppStore()
 /** ref tới component CreateNote */
 const create_note = ref<any>(null)
 
-/** hàm chuyển tab khi thay đổi nội dung ghi chú */
-const handleChangeInput = debounce(() => {
-  if (appStore.note_content) return
-  // khi xóa hết nội dung ghi chú thi chuyển sang tab danh sách ghi chú
-  changeTab('NOTE_LIST')
-}, 500)
+//lấy danh sách khi nhận thông báo từ chatbox
+WIDGET.onEvent(async () => {
+  getNoteList()
+})
+onMounted(() => {
+  //lấy danh sách khi bật app
+  getNoteList()
+})
 
 /** hàm chuyển tab */
 function changeTab(tab: string) {
@@ -65,5 +69,30 @@ function handleKeyUp(event: any) {
 
   // Sử dụng tham chiếu để gọi hàm createNewNote trong component con
   create_note.value.createNewNote()
+}
+
+/** hàm lấy danh sách ghi chú */
+async function getNoteList() {
+  try {
+    //bật loading
+    appStore.is_loading = true
+
+    // call api lấy danh sách ghi chú
+    let result = await request({
+      path: '/v1/note/read',
+      body: {},
+      method: 'POST',
+      json: true,
+    })
+
+    //tắt loading
+    appStore.is_loading = false
+
+    appStore.note_list = result.data
+  } catch (error) {
+    console.log('get note list', error)
+    //tắt loading
+    appStore.is_loading = false
+  }
 }
 </script>

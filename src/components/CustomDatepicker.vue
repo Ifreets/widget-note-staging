@@ -2,7 +2,7 @@
   <div class="flex gap-1">
     <VueDatePicker
       :disabled="props.frequency_selected === 'EVERY_DAY'"
-      v-model="date"
+      v-model="date_value"
       input-class-name="border-1 outline-none h-full text-sm text-gray-500 px-2 text-center"
       teleport-center
       :enable-time-picker="false"
@@ -39,7 +39,7 @@
           class="fixed flex flex-col top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border rounded text-sm shadow-md"
         >
           <p class="text-center border-b py-2">
-            {{ timestampToDate(date_value) }}
+            {{ timestampToDate(date_value.valueOf()) }}
           </p>
           <div class="flex flex-grow">
             <ul
@@ -79,7 +79,12 @@
                     'MINUTE'
                   ),
                 }"
-                @click="time_value.minute = item"
+                @click="
+                  () => {
+                    time_value.minute = item
+                    is_show_time_picker = false
+                  }
+                "
               >
                 {{ item.toString().padStart(2, '0') }}
               </li>
@@ -119,11 +124,9 @@ const props = defineProps<{
 }>()
 
 /** ngày đặt lịch */
-const date_value = defineModel<number>('date', {
-  default: 0,
+const date_value = defineModel<Date>('date', {
+  default: new Date(),
 })
-
-const date = ref(new Date(date_value.value))
 
 /** thời gian đặt lịch */
 const time_value = defineModel<{ hour: number; minute: number }>('time', {
@@ -156,11 +159,16 @@ const minutes = computed(() => {
 function prevent_pass(value: number, type: 'HOUR' | 'MINUTE') {
   if (
     props.frequency_selected !== 'NONE' ||
-    date.value.valueOf() > new Date().setHours(0, 0, 0, 0)
+    date_value.value.setHours(0, 0, 0, 0) > new Date().setHours(0, 0, 0, 0)
   )
     return false
   if (type === 'HOUR' && value < new Date().getHours()) return true
-  if (type === 'MINUTE' && value < new Date().getMinutes()) return true
+  if (
+    type === 'MINUTE' &&
+    value < new Date().getMinutes() &&
+    time_value.value.hour === new Date().getHours()
+  )
+    return true
   return false
 }
 
@@ -170,7 +178,7 @@ watch(
   () => {
     let today = new Date()
     today.setHours(0, 0, 0, 0)
-    date.value = today
+    date_value.value = today
     time_value.value = {
       hour: today.getHours(),
       minute: today.getMinutes(),
@@ -179,9 +187,9 @@ watch(
 )
 /** khi chọn ngày nếu là hôm nay thì đặt giờ là hiện tại */
 watch(
-  () => date.value,
+  () => date_value.value,
   (value) => {
-    if (value.valueOf() === new Date().setHours(0, 0, 0, 0))
+    if (value.setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0))
       time_value.value = {
         hour: new Date().getHours(),
         minute: new Date().getMinutes(),
@@ -193,19 +201,11 @@ watch(
 watch(
   () => time_value.value.hour,
   (newValue, oldValue) => {
+    if (time_value.value.minute < new Date().getMinutes())
+      time_value.value.minute = new Date().getMinutes()
     if (newValue === oldValue) return
     nextTick(() => {
       scrollToSelected(200, time_picker)
-    })
-  }
-)
-/** khi chọn phút thì tắt modal */
-watch(
-  () => time_value.value.minute,
-  (newValue, oldValue) => {
-    if (newValue === oldValue) return
-    nextTick(() => {
-      is_show_time_picker.value = false
     })
   }
 )
