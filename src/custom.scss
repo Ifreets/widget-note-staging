@@ -1,0 +1,360 @@
+.container {
+    padding: 8px;
+    overflow: hidden;
+    .tabs {
+        width: 100%;
+        height: 40px;
+        div {
+            width: 50%;
+            float: left;
+            height: 30px;
+        }
+    }
+    .labels {
+        width: 100%;
+        height: 25px;
+        display: flex;
+        // justify-content: space-between;
+        margin-top: 10px
+        div {
+            height: 15px;
+        }
+    }
+    .padding-bottom {
+        padding-bottom: 10px;
+    }
+    .input-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border: 1px solid #DFE1E4;
+        box-sizing: border-box;
+        border-radius: 5px;
+        .input-flex {
+            flex: 1;
+            // overflow-y: scroll;
+            overflow: hidden;
+            padding: 5px;
+            .chat-input-text:empty::before {
+                content: attr(placeholder);
+                pointer-events: none;
+                display: block;
+                color: rgba(0,0,0,.4);
+                background-color: transparent;
+                font-weight: 300;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .chat-input-text {
+                width: 100%;
+                min-height: 50px;
+                max-height: 50px;
+                outline: none;
+                font-size: 14px;
+            }
+        }
+    }
+    .time-select {
+        margin-top: 7px;
+        display: flex;
+        justify-content: space-between;
+        .title {
+            font-size: 12px;
+            color: #4F596A;
+        }
+        .alert-before {
+            font-size: 10px;
+            span {
+                font-weight: 600;
+            }
+            img {
+                margin-bottom: -2px;
+                margin-left: 5px;
+            }
+        }
+    }
+    .time-labels {
+        margin-top: 7px;
+        display: flex;
+        justify-content: space-between;
+        div {
+            min-width: 60px;
+            min-height: 24px;
+        }
+    }
+    .select-calendar {
+        display: flex;
+        justify-content: space-between;
+        // margin-top: 10px;
+        div {
+            width: 100%;
+            label {
+                font-size: 12px;
+                color: #4F596A;
+            }
+            select {
+                height: 30px;
+                border: 1px solid #BCC0C6;
+                border-radius: 5px;
+                width: 100%;
+                // margin-top: 7px;
+                background: white;
+                option {
+                    font-size: 12px;
+                    // color: #4F596A;
+                }
+            }
+            .date-picker {
+                height: 30px !important;
+                width: 96%;
+                // margin-top: 7px;
+            }
+        }
+    }
+    .button {
+        display: flex;
+        justify-content: space-between;
+        height: 40px;
+        margin-top: 10px;
+        gap: 14px;
+
+        .btn-script {
+            width: 50%;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            width: 50%;
+        }
+
+        .btn-update {
+            width : 48%;
+        }
+    }
+
+    .script_modal {
+        width: 93%;
+        height: 250px;
+        position: absolute;
+        z-index: 1;
+        margin: auto;
+        background: #FFFFFF;
+        border: 1px solid #DFE1E4;
+        border-radius: 5px;
+        top: 12px;
+        padding: 5px;
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+
+            div {
+                font-size: 12px;
+                font-weight: bold;
+                color: #848B97;
+            }
+        }
+
+        .script-list {
+            margin: auto;
+            width: 316px;
+            height: 34px;
+            border: 1px solid #DFE1E4;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            p {
+                margin: 0;
+                font-size: 12px;
+                color: #4F596A; 
+                width: 250px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            div {
+                height: 18px;
+                width: 40px;
+            }
+        }
+        .script-empty {
+            width: 260px;
+            height: 96px;
+            font-size: 12px;
+            margin: auto;
+            padding: 5px;
+            margin-top: 50px;
+            .text-bold {
+                font-weight: bold;
+            }
+
+            .text-orange {
+                text-decoration: underline;
+            }
+        }
+        
+    }
+    .body-schedule-list {
+        // max-height: 300px;
+        // overflow: scroll;
+        // overflow-x: hidden;
+        .schedule-list {
+            // margin-bottom: 8px;
+            // width: 97%;
+            // padding: 5px;
+            // background: #EFF2F5;
+            // border: 1px solid #F2F2F2;
+            // border-radius: 5px 10px;
+            // display: flex;
+            // align-items: center;
+
+            .staff-avatar {
+                // margin-right: 10px;
+            }
+
+            .note-content {
+                // width: 100%;
+                // padding-right: 3px;
+            }
+
+            .time{
+                // display: flex;
+                // justify-content: space-between;
+                // font-size: 10px;
+
+                .time-number {
+                    // font-weight: bold;
+                }
+
+            }
+
+            .content {
+                // display: flex;
+                // margin-top: 8px;
+
+                .label-primary {
+                    // width: 45px;
+                    // height: 18px;
+                    
+                    span {
+                        // width: 50px;
+                        // white-space: nowrap;
+                        // overflow: hidden;
+                        // text-overflow: ellipsis;
+                        // text-align: center;
+                    }
+                }
+
+                .schedule-content {
+                    // font-size: 14px;
+                    // color: #4F596A;
+                    // margin-left: 10px;
+                    // margin-top: 3px;
+
+                    p {
+                        // margin: 0;
+                        // width: 240px;
+                        // white-space: nowrap;
+                        // overflow: hidden;
+                        // text-overflow: ellipsis;
+                        // text-align: left;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.label-primary {
+    font-size: 10px;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 32px;
+    border: 1px solid #DFE1E4;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+.custom-label {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.custom-time {
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.label-gray {
+    color: #140F2D;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.label-black {
+    color: #FFFFFF;
+    background: #4F596A;
+    border: 1px solid #4F596A;
+}
+
+.label-orange {
+    background: #F55600;
+    color: #FFFFFF;
+    border-color: #F55600;
+}
+
+.btn {
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.text-orange {
+    color: #F55600;
+}
+
+.text-green {
+    color: #27AE60;
+}
+
+.text-black {
+    color: #4F596A;
+}
+
+.text-red {
+    color: #FF3000;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.line-through {
+    text-decoration: line-through;
+}
+
+.mx-input {
+    height: 30px;
+    pointer-events: none !important;
+}
+
+.mx-datepicker-main {
+    right: 8px !important;
+    left: unset !important;
+    top: 8px !important;
+}
+
+select {
+    text-indent: 8px;
+  }
