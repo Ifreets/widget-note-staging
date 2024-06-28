@@ -3,13 +3,26 @@
     <div
       class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white"
     >
-      <textarea
-        class="w-full min-h-14 border rounded-md pt-2 pb-5 px-3 outline-none text-sm resize-none"
-        v-model="appStore.note_content"
-        :placeholder="'Tạo ghi chú mới...(Nhấn Shift + Enter để tạo nhanh)'"
-        @keyup="handleKeyUp"
-      />
-
+      <div class="min-h-14 h-14 relative w-full">
+        <textarea
+          id="content_note"
+          class="w-full h-full border rounded-md py-1.5 pl-3 pr-9 outline-none text-sm resize-none placeholder:text-slate-400"
+          v-model="appStore.note_content"
+          :placeholder="`Tạo ghi chú mới đến ${commonStore.data_client?.public_profile?.client_name}`"
+          @keyup="handleKeyUp"
+        />
+        <label
+          v-if="!appStore.note_content"
+          class="absolute bottom-0 left-0 text-slate-400 px-3.5 py-1.5 -z-1"
+          for="content_note"
+        >
+          ( Nhấn Shift + Enter để tạo nhanh )
+        </label>
+        <img
+          :src="commonStore.getUserAvatar()"
+          class="w-6 h-6 absolute top-1 right-1 rounded-md"
+        />
+      </div>
       <!-- List tabs -->
       <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
 
@@ -30,7 +43,7 @@ import { request } from '@/services/request'
 
 //* import library
 import { onMounted, ref } from 'vue'
-import { useAppStore } from '@/services/stores'
+import { useAppStore, useCommonStore } from '@/services/stores'
 import WIDGET from 'bbh-chatbox-widget-js-sdk'
 
 //* import components
@@ -39,9 +52,10 @@ import NoteList from './NoteList.vue'
 
 // stores
 const appStore = useAppStore()
+const commonStore = useCommonStore()
 
 /** ref tới component CreateNote */
-const create_note = ref<InstanceType<typeof CreateNote>>()
+const create_note = ref<any>(null)
 
 //lấy danh sách khi nhận thông báo từ chatbox
 WIDGET.onEvent(async () => {
@@ -57,19 +71,18 @@ function changeTab(tab: 'NOTE_LIST' | 'CREATE_NEW') {
   appStore.tab_selected = tab
 }
 
-/** hàm bắt sự kiện gõ phím ở ô nhập nội dung ghi chứ */
+/** hàm bắt sự kiện nhấn shift + enter để tạo ghi chứ */
 function handleKeyUp(event: any) {
   // nếu có nội dung ghi chú thi chuyển sang tab tạo ghi chú
   if (appStore.note_content) changeTab('CREATE_NEW')
-
-  // nếu không nhấn shift + enter thì không thực hiện gì
+  // nếu khong shift + enter thi khong thuc hành
   if (!event.shiftKey || !(event.keyCode === 13)) return
 
-  // nếu nhấn shift + enter và có nội dung ghi chứ thì tạo ghi chú
+  // nếu shift + enter và có nội dung ghi chứ thì tạo ghi chú
   if (!appStore.note_content) return
 
   // Sử dụng tham chiếu để gọi hàm createNewNote trong component con
-  create_note.value?.createNewNote()
+  create_note.value.createNewNote()
 }
 
 /** hàm lấy danh sách ghi chú */
@@ -89,7 +102,6 @@ async function getNoteList() {
     //tắt loading
     appStore.is_loading = false
 
-    //lưu danh sách ghi chú vào store
     appStore.note_list = result.data
   } catch (error) {
     console.log('get note list', error)
