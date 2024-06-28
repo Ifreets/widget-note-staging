@@ -3,18 +3,6 @@
     <div
       class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white"
     >
-      <<<<<<< HEAD
-      <textarea
-        class="w-full min-h-14 border rounded-md pt-2 pb-5 px-3 outline-none text-sm resize-none"
-        v-model="appStore.note_content"
-        :placeholder="'Tạo ghi chú mới...(Nhấn Shift + Enter để tạo nhanh)'"
-        @keyup="handleKeyUp"
-      />
-
-      <!-- List tabs -->
-      <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
-
-      =======
       <div class="min-h-14 h-14 relative w-full">
         <textarea
           id="content_note"
@@ -38,7 +26,6 @@
       <!-- List tabs -->
       <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
 
-      >>>>>>> improve/ui
       <!-- Create tabs -->
       <CreateNote
         ref="create_note"
