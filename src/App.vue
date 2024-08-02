@@ -10,7 +10,7 @@
 // * import function
 import { useAppStore, useCommonStore } from './services/stores'
 import { Toast } from '@/services/toast'
-import { queryString } from './services/helper'
+import { queryString, checkDate } from './services/helper'
 
 // * import library
 import WIDGET from 'bbh-chatbox-widget-js-sdk'
@@ -38,7 +38,7 @@ const active_app = ref<boolean>(false)
 onMounted(() => {
   let note_content = queryString('note_content')
   let date_create = queryString('date_create')
-  if (note_content && date_create) {
+  if (note_content || (date_create && checkDate(date_create))) {
     //chuyển màn tạo ghi chú
     appStore.tab_selected = 'CREATE_NEW'
     appStore.is_auto_create = true
@@ -52,6 +52,7 @@ onMounted(() => {
     getDataClient()
   })
 })
+
 /** hàm lấy thông tin khách hàng */
 async function getDataClient() {
   try {
