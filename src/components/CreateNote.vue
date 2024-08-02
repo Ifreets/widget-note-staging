@@ -71,9 +71,12 @@
 //* import function
 import { useAppStore, useCommonStore } from '@/services/stores'
 import { request } from '@/services/request'
+import { getHours } from 'date-fns/getHours'
+import { getMinutes } from 'date-fns/getMinutes'
+import { queryString } from '@/services/helper'
 
 // * import library
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Toast } from '@/services/toast'
 import { useI18n } from 'vue-i18n'
 
@@ -112,6 +115,31 @@ const date_value = ref<Date>(initDate())
 
 /** giờ đặt lịch */
 const time_value = ref<{ hour: number; minute: number }>(initTime())
+
+onMounted(() => {
+  // lấy data từ query string
+  let param_date = queryString('date_create')
+  let note_content = queryString('note_content')
+  // nếu có nội dung từ param thì sẽ lấy thêm các data từ đó để khởi tạo ghi chú
+  if (note_content && param_date && appStore.is_auto_create) {
+    // bật nhắc lịch
+    is_remind.value = true
+    
+    // set nội dung
+    appStore.note_content = note_content.replace('\\n', '\n')
+    // chuyển timetamp giây về mili giây
+    if(param_date?.length === 10) param_date = param_date + '000'
+    if(!param_date) return
+    // set thời gian
+    date_value.value = new Date(Number(param_date))
+    time_value.value = {
+      hour: getHours(date_value.value),
+      minute: getMinutes(date_value.value),
+    }
+    // tắt cờ khởi tạo data từ param
+    appStore.is_auto_create = false
+  }
+})
 
 /** hàm khởi tạo giá trị tần suất */
 function initFrequency() {
