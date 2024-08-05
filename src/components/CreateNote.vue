@@ -120,8 +120,8 @@ const time_value = ref<{ hour: number; minute: number }>(initTime())
 
 onMounted(() => {
   // lấy data từ query string
-  let param_date = queryString('date_create')
-  let note_content = queryString('note_content')
+  let param_date = queryString('datetime')
+  let note_content = queryString('note')
   // nếu có nội dung từ param thì sẽ lấy thêm các data từ đó để khởi tạo ghi chú
   if (appStore.is_auto_create) {    
     // set nội dung

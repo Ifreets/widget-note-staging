@@ -36,8 +36,8 @@ const $toast = new Toast()
 const active_app = ref<boolean>(false)
 
 onMounted(() => {
-  let note_content = queryString('note_content')
-  let date_create = queryString('date_create')
+  let note_content = queryString('note')
+  let date_create = queryString('datetime')
   if (note_content || (date_create && checkDate(date_create))) {
     //chuyển màn tạo ghi chú
     appStore.tab_selected = 'CREATE_NEW'
