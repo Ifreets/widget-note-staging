@@ -55,10 +55,6 @@ function autoCreate(){
   /** hợp lệ của thời gian */
   let is_date_valid = date_create
 
-  if(!is_date_valid){
-    $toast.warning('Thời gian hiện tại đã có thời gian mà bạn hẹn lịch')
-  }
-
   if (note_content || is_date_valid) {
     //chuyển màn tạo ghi chú
     appStore.tab_selected = 'CREATE_NEW'
