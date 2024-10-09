@@ -3,7 +3,7 @@
     class="body-schedule-list h-full overflow-y-auto scrollbar-thin flex flex-col gap-2"
   >
     <div
-      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm text-slate-500 cursor-pointer hover:bg-slate-200"
+      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm cursor-pointer hover:bg-slate-200"
       v-for="(item, index) in appStore.note_list"
       :key="index"
       v-if="appStore.note_list.length"
@@ -25,7 +25,7 @@
         </span>
 
         <span
-          class="text-orange-500 font-semibold"
+          class="text-orange-700 font-semibold"
           v-show="!item.finished && item.schedule_time && !item.is_remove"
         >
           {{ item.schedule_time && showTimeMore(item.schedule_time) }}
@@ -38,10 +38,14 @@
           {{ $t('clear_calendar') }}
         </span>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-start gap-2">
         <img
           v-if="item.schedule_time"
           :src="CalendarIcon"
+        />
+        <img
+          v-else
+          :src="NoteIcon"
         />
         <div>
           <p
@@ -77,13 +81,15 @@
 <script setup lang="ts">
 //* import function
 import { convertTimeList } from '@/services/format/date'
+import { useAppStore } from '@/services/stores'
 
 //* import library
 import { useI18n } from 'vue-i18n'
 
 //* import icon
+import NoteIcon from '@/assets/note.svg'
 import CalendarIcon from '@/assets/calendar.svg'
-import { useAppStore } from '@/services/stores'
+
 import { INote } from '@/interface/note'
 
 // * i18n

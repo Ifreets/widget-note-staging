@@ -109,18 +109,18 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { isToday, isTomorrow, isYesterday } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
+
 /** label các thứ trong toàn */
 const dayInWeek = [
-  'Chủ nhật',
-  'Thứ hai',
-  'Thứ ba',
-  'Thứ tư',
-  'Thứ năm',
-  'Thứ sáu',
-  'Thứ bảy',
+  t('sunday'),
+  t('monday'),
+  t('tuesday'),
+  t('wednesday'),
+  t('thursday'),
+  t('friday'),
+  t('saturday'),
 ]
-
-const { t } = useI18n()
 
 /** props */
 const props = defineProps<{
@@ -232,33 +232,38 @@ function customFormat(date: Date) {
   return `${dayInWeek[date.getDay()]}`
 }
 
+/** format cho datepicker khi không chọn tần suất là hằng tuần */
 function formatNormal(date: Date): string {
+  /** chuỗi đứng trước ngày tháng năm */
   let before_string = ''
+
+  /** hôm nay */
   if(isToday(date)){
     before_string = t('today')
   }
+
+  /** hôm qua */
   if(isYesterday(date)){
     before_string = t('yesterday')
   }
+
+  /** ngày mai */
   if(isTomorrow(date)){
     before_string = t('tomorrow')
   }
 
+  /** hiện thứ */
   if(!before_string){
-    switch(date.getDay()){
-      case 0: before_string = t('sunday'); break;
-      case 1: before_string = t('monday'); break;
-      case 2: before_string = t('tuesday'); break;
-      case 3: before_string = t('wednesday'); break;
-      case 4: before_string = t('thursday'); break;
-      case 5: before_string = t('friday'); break;
-      case 6: before_string = t('saturday'); break;
-      default: before_string = '';
-    }
+    before_string = dayInWeek[date.getDay()]
   }
 
+  /** ngày */
   const day = date.getDate();
+
+  /** tháng */
   const month = date.getMonth() + 1;
+
+  /** năm */
   const year = date.getFullYear();
 
   return `${before_string}, ${day}/${month}/${year}`;
