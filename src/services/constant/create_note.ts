@@ -1,3 +1,5 @@
+import { i18n } from "@/lang/i18n"
+
 /** Tần suất nhắc lịch */
 export const FREQUENCY = [
   {
@@ -16,4 +18,15 @@ export const FREQUENCY = [
     value: 'every_month',
     label: 'EVERY_MONTH',
   },
+]
+
+/** label các thứ trong toàn */
+export const dayInWeek = [
+  i18n.global.t('sunday'),
+  i18n.global.t('monday'),
+  i18n.global.t('tuesday'),
+  i18n.global.t('wednesday'),
+  i18n.global.t('thursday'),
+  i18n.global.t('friday'),
+  i18n.global.t('saturday'),
 ]

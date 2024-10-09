@@ -100,27 +100,14 @@
 // TODO : chưa improve code
 //* import function
 import { scrollToSelected } from '@/services/scroll'
-import { timestampToDate } from '@/services/format/date'
+import { stringOfDay, timestampToDate } from '@/services/format/date'
+import { dayInWeek } from '@/services/constant/create_note'
+
 //* import library
 import { vi } from 'date-fns/locale'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { computed, nextTick, ref, watch } from 'vue'
-import { isToday, isTomorrow, isYesterday } from 'date-fns'
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n()
-
-/** label các thứ trong toàn */
-const dayInWeek = [
-  t('sunday'),
-  t('monday'),
-  t('tuesday'),
-  t('wednesday'),
-  t('thursday'),
-  t('friday'),
-  t('saturday'),
-]
 
 /** props */
 const props = defineProps<{
@@ -234,28 +221,7 @@ function customFormat(date: Date) {
 
 /** format cho datepicker khi không chọn tần suất là hằng tuần */
 function formatNormal(date: Date): string {
-  /** chuỗi đứng trước ngày tháng năm */
-  let before_string = ''
-
-  /** hôm nay */
-  if(isToday(date)){
-    before_string = t('today')
-  }
-
-  /** hôm qua */
-  if(isYesterday(date)){
-    before_string = t('yesterday')
-  }
-
-  /** ngày mai */
-  if(isTomorrow(date)){
-    before_string = t('tomorrow')
-  }
-
-  /** hiện thứ */
-  if(!before_string){
-    before_string = dayInWeek[date.getDay()]
-  }
+  
 
   /** ngày */
   const day = date.getDate();
@@ -266,7 +232,7 @@ function formatNormal(date: Date): string {
   /** năm */
   const year = date.getFullYear();
 
-  return `${before_string}, ${day}/${month}/${year}`;
+  return `${stringOfDay(date)}, ${day}/${month}/${year}`;
 }
 </script>
 <style lang="scss">

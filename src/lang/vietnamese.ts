@@ -23,7 +23,7 @@ export default {
   time_select: 'Chọn thời gian nhắc lịch',
   script: 'Kịch bản',
   close: 'Đóng',
-  save: 'Tạo ghi chú',
+  save: 'Tạo nhắc lịch',
   all: 'Tất cả',
   choose_script: 'Chọn kịch bản trả lời khách hàng tự động',
   no_script: 'Chưa có kịch bản, vui lòng truy cập chức năng',
