@@ -60,6 +60,8 @@ const create_note = ref<InstanceType<typeof CreateNote>>()
 //lấy danh sách khi nhận thông báo từ chatbox
 WIDGET.onEvent(async () => {
   getNoteList()
+  if(appStore.tab_selected === 'CREATE_NEW') changeTab('NOTE_LIST')
+  appStore.note_content = ''
 })
 onMounted(() => {
   //lấy danh sách khi bật app

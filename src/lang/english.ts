@@ -24,6 +24,7 @@ export default {
   script: 'Scripts',
   close: 'Close',
   save: 'Create note',
+  create_reminder: 'Create reminder',
   all: 'All',
   choose_script: 'Choose an automated customer response scenario',
   no_script: 'No script yet, please access the platform',

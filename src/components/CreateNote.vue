@@ -60,7 +60,8 @@
         "
         @click="createNewNote()"
       >
-        {{ appStore.isUpdateNote() ? $t('update') : $t('save') }}
+        <span v-if="appStore.isUpdateNote()">{{ $t('update') }}</span>
+        <span v-else>{{ is_remind ? $t('create_reminder') : $t('save') }}</span>
       </div>
     </div>
   </div>

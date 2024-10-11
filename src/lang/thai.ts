@@ -24,6 +24,7 @@ export default {
   script: 'สคริปต์', //'Kịch bản',
   close: 'ปิด', //'Đóng',
   save: 'สร้าง', //'Tạo ghi chú',
+  create_reminder: 'สร้างเตือน', //'Tạo nhắc lịch',
   all: 'ทั้งหมด', //'Tất cả',
   choose_script: 'เลือกสคริปต์เพื่อตอบลูกค้าโดยอัตโนมัติ', //'Chọn kịch bản trả lời khách hàng tự động',
   no_script: 'ยังไม่มีสคริปต์ โปรดเข้าใช้ฟังก์ชันนี้', //'Chưa có kịch bản, vui lòng truy cập chức năng',
