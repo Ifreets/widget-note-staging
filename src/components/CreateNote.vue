@@ -119,8 +119,12 @@ const time_value = ref<{ hour: number; minute: number }>(initTime())
 
 onMounted(() => {
   // lấy data từ query string
-  let param_date = queryString('datetime')
-  let note_content = queryString('note')
+  // let param_date = queryString('datetime')
+  // let note_content = queryString('note')
+  const param_date = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime
+  const note_content = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.input_message
+
+
   // nếu có nội dung từ param thì sẽ lấy thêm các data từ đó để khởi tạo ghi chú
   if (appStore.is_auto_create) {
     // set nội dung

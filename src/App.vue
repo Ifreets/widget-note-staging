@@ -8,18 +8,19 @@
 
 <script setup lang="ts">
 // * import function
-import { useAppStore, useCommonStore } from './services/stores'
 import { Toast } from '@/services/toast'
-import { queryString } from './services/helper'
+import { queryString } from '@/services/helper'
+import { useAppStore, useCommonStore } from '@/services/stores'
+import { decodeClientV2 } from '@/services/api/chatbot'
 
 // * import library
 import WIDGET from 'bbh-chatbox-widget-js-sdk'
 import { onMounted, ref } from 'vue'
 
 // * import component
-import DashBoard from './components/DashBoard.vue'
-import ActiveWidget from './components/ActiveWidget.vue'
-import Loading from './components/Loading.vue'
+import DashBoard from '@/components/DashBoard.vue'
+import ActiveWidget from '@/components/ActiveWidget.vue'
+import Loading from '@/components/Loading.vue'
 
 // let url_string = window.location.href
 // let url = new URL(url_string)
@@ -43,17 +44,19 @@ onMounted(() => {
     // ghi lại thông tin khách hàng mới
     getDataClient()
   })
-  autoCreate()
 })
 
 /** hàm tự động tạo ghi chú */
 function autoCreate(){
-  let note_content = queryString('note')
-  let date_create = queryString('datetime')
-  if(!note_content && !date_create) return
+  // let note_content = queryString('note')
+  // let date_create = queryString('datetime')
+
+  const param_date = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime
+  const note_content = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.input_message
+  if(!note_content && !param_date) return
 
   /** hợp lệ của thời gian */
-  let is_date_valid = date_create
+  let is_date_valid = param_date
 
   if (note_content || is_date_valid) {
     //chuyển màn tạo ghi chú
@@ -69,7 +72,14 @@ async function getDataClient() {
     commonStore.is_loading_full_screen = true
 
     // lấy thông tin khách hàng
-    commonStore.data_client = await WIDGET.decodeClient()
+    // commonStore.data_client = await WIDGET.decodeClient()
+    const data = await decodeClientV2({
+      access_token: queryString('partner_token'),
+      client_id: queryString('client_id'),
+      message_id: queryString('message_id'),
+      secret_key: $env.secret_key
+    })
+    commonStore.data_client = data.data
 
     //tắt loading
     commonStore.is_loading_full_screen = false
@@ -87,10 +97,20 @@ async function activeApp() {
     commonStore.is_loading_full_screen = true
 
     /** lấy thông tin của khách hàng */
-    commonStore.data_client = await WIDGET.decodeClient()
+    // commonStore.data_client = await WIDGET.decodeClient()
+    const data = await decodeClientV2({
+      access_token: queryString('partner_token'),
+      client_id: queryString('client_id'),
+      message_id: queryString('message_id'),
+      secret_key: $env.secret_key
+    })
+
+    commonStore.data_client = data.data
 
     //nếu thành công thì không cho vào màn kích hoạt
     active_app.value = false
+
+    autoCreate()
 
     //tắt loading
     commonStore.is_loading_full_screen = false
