@@ -48,11 +48,20 @@ onMounted(() => {
 
 /** hàm tự động tạo ghi chú */
 function autoCreate(){
-  // let note_content = queryString('note')
-  // let date_create = queryString('datetime')
+  let param_date = queryString('datetime') || ''
+  let note_content = queryString('note') || ''
 
-  const param_date = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime
-  const note_content = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.input_message
+  const partner_token = queryString('partner_token')
+
+  if (partner_token) {
+    param_date =
+      commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime?.toString() ||
+      ''
+    note_content =
+      commonStore?.data_client?.public_profile?.ai?.[0]?.ctas
+        ?.schedule_appointment?.input_message || ''
+  }
+
   if(!note_content && !param_date) return
 
   /** hợp lệ của thời gian */
@@ -71,15 +80,7 @@ async function getDataClient() {
     //bật loading
     commonStore.is_loading_full_screen = true
 
-    // lấy thông tin khách hàng
-    // commonStore.data_client = await WIDGET.decodeClient()
-    const data = await decodeClientV2({
-      access_token: queryString('partner_token'),
-      client_id: queryString('client_id'),
-      message_id: queryString('message_id'),
-      secret_key: $env.secret_key
-    })
-    commonStore.data_client = data.data
+    await decodeClient()
 
     //tắt loading
     commonStore.is_loading_full_screen = false
@@ -96,16 +97,7 @@ async function activeApp() {
     //bật loading
     commonStore.is_loading_full_screen = true
 
-    /** lấy thông tin của khách hàng */
-    // commonStore.data_client = await WIDGET.decodeClient()
-    const data = await decodeClientV2({
-      access_token: queryString('partner_token'),
-      client_id: queryString('client_id'),
-      message_id: queryString('message_id'),
-      secret_key: $env.secret_key
-    })
-
-    commonStore.data_client = data.data
+    await decodeClient()
 
     //nếu thành công thì không cho vào màn kích hoạt
     active_app.value = false
@@ -131,6 +123,28 @@ async function activeApp() {
     commonStore.is_loading_full_screen = false
   }
 }
+
+async function decodeClient(){
+  try {
+    // lấy thông tin khách hàng
+    const partner_token = queryString('partner_token')
+
+    if(partner_token){
+      const data = await decodeClientV2({
+        access_token: queryString('partner_token'),
+        client_id: queryString('client_id'),
+        message_id: queryString('message_id'),
+        secret_key: $env.secret_key
+      })
+      commonStore.data_client = data.data
+    }else{
+      commonStore.data_client = await WIDGET.decodeClient()
+    } 
+  }catch (error) {
+    console.log('getDataClient', error)
+  }
+}
+
 </script>
 
 <style lang="scss">

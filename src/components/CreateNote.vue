@@ -79,7 +79,7 @@ import { Toast } from '@/services/toast'
 import { useI18n } from 'vue-i18n'
 import { getHours } from 'date-fns/getHours'
 import { getMinutes } from 'date-fns/getMinutes'
-import { checkDate } from '@/services/helper'
+import { checkDate, queryString } from '@/services/helper'
 
 //* import component
 import CustomDatepicker from '@/components/CustomDatepicker.vue'
@@ -119,11 +119,19 @@ const time_value = ref<{ hour: number; minute: number }>(initTime())
 
 onMounted(() => {
   // lấy data từ query string
-  // let param_date = queryString('datetime')
-  // let note_content = queryString('note')
-  const param_date = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime
-  const note_content = commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.input_message
+  let param_date = queryString('datetime') || ''
+  let note_content = queryString('note') || ''
 
+  const partner_token = queryString('partner_token')
+
+  if (partner_token) {
+    param_date =
+      commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime?.toString() ||
+      ''
+    note_content =
+      commonStore?.data_client?.public_profile?.ai?.[0]?.ctas
+        ?.schedule_appointment?.input_message || ''
+  }
 
   // nếu có nội dung từ param thì sẽ lấy thêm các data từ đó để khởi tạo ghi chú
   if (appStore.is_auto_create) {
