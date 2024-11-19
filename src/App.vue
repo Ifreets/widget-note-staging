@@ -129,6 +129,9 @@ async function decodeClient(){
     // lấy thông tin khách hàng
     const partner_token = queryString('partner_token')
 
+    console.log('partner_token', partner_token);
+    
+
     if(partner_token){
       const data = await decodeClientV2({
         access_token: queryString('partner_token'),
