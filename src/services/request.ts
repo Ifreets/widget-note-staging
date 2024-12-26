@@ -17,7 +17,8 @@ export const request = async ({
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json',
         // lấy access token từ widget sdk
-        token: WIDGET.access_token || '',
+        token: WIDGET.partner_token || '',
+        'client-id': WIDGET.client_id || '',
         key: globalThis.$env.secret_key,
         ...headers,
       }

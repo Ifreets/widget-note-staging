@@ -11,7 +11,6 @@
 import { Toast } from '@/services/toast'
 import { queryString } from '@/services/helper'
 import { useAppStore, useCommonStore } from '@/services/stores'
-import { decodeClientV2 } from '@/services/api/chatbot'
 
 // * import library
 import WIDGET from 'bbh-chatbox-widget-js-sdk'
@@ -127,22 +126,22 @@ async function activeApp() {
 async function decodeClient(){
   try {
     // lấy thông tin khách hàng
-    const partner_token = queryString('partner_token')
+    // const partner_token = queryString('partner_token')
 
-    console.log('partner_token', partner_token);
+    // console.log('partner_token', partner_token);
     
-
-    if(partner_token){
-      const data = await decodeClientV2({
-        access_token: queryString('partner_token'),
-        client_id: queryString('client_id'),
-        message_id: queryString('message_id'),
-        secret_key: $env.secret_key
-      })
-      commonStore.data_client = data.data
-    }else{
-      commonStore.data_client = await WIDGET.decodeClient()
-    } 
+    commonStore.data_client = await WIDGET.getClientInfo()
+    // if(partner_token){
+    //   const data = await decodeClientV2({
+    //     access_token: queryString('partner_token'),
+    //     client_id: queryString('client_id'),
+    //     message_id: queryString('message_id'),
+    //     secret_key: $env.secret_key
+    //   })
+    //   commonStore.data_client = data.data
+    // }else{
+    //   commonStore.data_client = await WIDGET.decodeClient()
+    // } 
   }catch (error) {
     console.log('getDataClient', error)
   }
