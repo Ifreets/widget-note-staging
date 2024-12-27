@@ -130,18 +130,18 @@ async function decodeClient(){
 
     // console.log('partner_token', partner_token);
     
-    commonStore.data_client = await WIDGET.getClientInfo()
-    // if(partner_token){
-    //   const data = await decodeClientV2({
-    //     access_token: queryString('partner_token'),
-    //     client_id: queryString('client_id'),
-    //     message_id: queryString('message_id'),
-    //     secret_key: $env.secret_key
-    //   })
-    //   commonStore.data_client = data.data
-    // }else{
-    //   commonStore.data_client = await WIDGET.decodeClient()
-    // } 
+    if(WIDGET.partner_token){
+      commonStore.data_client = await WIDGET.getClientInfo()
+      // const data = await decodeClientV2({
+      //   access_token: queryString('partner_token'),
+      //   client_id: queryString('client_id'),
+      //   message_id: queryString('message_id'),
+      //   secret_key: $env.secret_key
+      // })
+      // commonStore.data_client = data.data
+    }else{
+      commonStore.data_client = await WIDGET.decodeClient()
+    } 
   }catch (error) {
     console.log('getDataClient', error)
   }
