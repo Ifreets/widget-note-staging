@@ -32,6 +32,8 @@ export function useAutoCreate() {
     document.addEventListener('message', (event: any) => {
       console.log('[App] Nhận event từ Frame:::', event.data)
 
+      alert(event.data)
+
       /** dữ liệu tự động tạo ghi chú được gửi từ app chatbot Native */
       const AUTO_CREATE_NOTE_EVENT = JSON.parse(event.data)
 
