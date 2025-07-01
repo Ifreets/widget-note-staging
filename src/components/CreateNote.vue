@@ -208,17 +208,25 @@ function initDate() {
 function initTime() {
   // lấy thời gian hiện tại
   let currrent_date = new Date()
+
+  /** thời gian đặt lịch */
+  const SCHEDULE_TIME = appStore.selectedNote()?.schedule_time
+
   if (
     // kiểm tra xem có phải chế độ sửa không, nếu khác -1 là chế độ sửa
     appStore.isUpdateNote() &&
-    // kiểm tra xem giờ đặt lịch có tồn tại không
-    appStore.selectedNote()?.schedule_hour &&
-    // kiểm tra xem phút đặt lịch có tồn tại không
-    appStore.selectedNote()?.schedule_minute
+    // kiểm tra xem thời gian đặt lịch có tồn tại không
+    SCHEDULE_TIME
   ) {
+    /** số giờ của thời gian đặt lịch */
+    const SCHEDULE_HOUR = getHours(SCHEDULE_TIME)
+    /** số phút của thời gian đặt lịch */
+    const SCHEDULE_MINUTE = getMinutes(SCHEDULE_TIME)
+    
+
     return {
-      hour: appStore.selectedNote()?.schedule_hour || 0,
-      minute: appStore.selectedNote()?.schedule_minute || 0,
+      hour: SCHEDULE_HOUR || 0,
+      minute: SCHEDULE_MINUTE || 0,
     }
   }
   // nếu không tồn tại trả về giờ và phút hiện tại

@@ -3,10 +3,10 @@
     <div
       class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white"
     >
-      <div class="min-h-14 h-14 relative w-full">
+      <div class="min-h-max relative w-full">
         <textarea
           id="content_note"
-          class="w-full h-full border rounded-md py-1.5 pl-3 pr-9 outline-none text-sm resize-none placeholder:text-slate-400 placeholder:truncate"
+          class="w-full h-full border rounded-md min-h-16 py-1.5 pl-3 pr-9 outline-none text-sm resize-y placeholder:text-slate-400 placeholder:truncate"
           v-model="appStore.note_content"
           :placeholder="`${$t('placeholder_create_new')} ${
             commonStore.data_client?.public_profile?.client_name
@@ -15,7 +15,7 @@
         />
         <label
           v-if="!appStore.note_content"
-          class="absolute bottom-0 left-0 text-slate-400 px-3.5 py-1.5 -z-1"
+          class="absolute top-6 left-0 text-slate-400 px-3.5 py-1.5 -z-1"
           for="content_note"
         >
           ( {{ $t('guide') }} )
