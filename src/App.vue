@@ -44,20 +44,26 @@ onMounted(() => {
   // hàm kiểm tra xem đã kích hoạt chưa và chuyển đến màn tương ứng
   activeApp()
   // lắng nghe event từ merchant khi chuyển đoạn chat
-  WIDGET.onEvent(() => {
+  WIDGET.onEvent((e: any, data: any) => {
+    /** dữ liệu tự động tạo ghi chú được gửi từ app chatbot Native */
+    const DATA = typeof data === 'string' ? JSON.parse(data) : data
+    
+    // nếu sự kiện không phải là reload thì bỏ qua
+    if (DATA.type !== 'RELOAD' || DATA.from !== 'CHATBOX') return
+
     // ghi lại thông tin khách hàng mới
     getDataClient()
   })
 
   // gửi sự kiện đến chatbot để lấy dữ liệu
   sendPreviewEvent({
-    type: 'get.data'
+    type: 'get.data',
   })
 
   // fakeEvent()
 
   // lắng nghe event từ app chatbot
-  listenPreviewEvent((data:any) => {
+  listenPreviewEvent((data: any) => {
     /** nội dung ghi chú */
     const NOTE_CONTENT = data.note
 
@@ -65,16 +71,17 @@ onMounted(() => {
     const DATE_TIME = data.datetime?.toString() || ''
 
     /** đường dẫn nội dung ghi chú */
-    const NOTE_PATH = 'public_profile.ai[0].ctas.schedule_appointment.input_message'
+    const NOTE_PATH =
+      'public_profile.ai[0].ctas.schedule_appointment.input_message'
 
     /** đường dẫn thời gian hẹn lịch */
     const DATE_PATH = 'public_profile.ai[0].ctas.schedule_appointment.datetime'
 
     // lưu lại nội dung ghi chú
-    set(commonStore.data_client,NOTE_PATH, NOTE_CONTENT)
+    set(commonStore.data_client, NOTE_PATH, NOTE_CONTENT)
 
     // lưu lại thời gian hẹn lịch
-    set(commonStore.data_client,DATE_PATH, DATE_TIME)
+    set(commonStore.data_client, DATE_PATH, DATE_TIME)
 
     if (NOTE_CONTENT || DATE_TIME) {
       appStore.tab_selected = 'CREATE_NEW'
@@ -84,7 +91,7 @@ onMounted(() => {
 })
 
 /** hàm tự động tạo ghi chú */
-function autoCreate(){
+function autoCreate() {
   let param_date = queryString('datetime') || ''
   let note_content = queryString('note') || ''
 
@@ -99,7 +106,7 @@ function autoCreate(){
         ?.schedule_appointment?.input_message || ''
   }
 
-  if(!note_content && !param_date) return
+  if (!note_content && !param_date) return
 
   /** hợp lệ của thời gian */
   let is_date_valid = param_date
@@ -161,14 +168,14 @@ async function activeApp() {
   }
 }
 
-async function decodeClient(){
+async function decodeClient() {
   try {
     // lấy thông tin khách hàng
     // const partner_token = queryString('partner_token')
 
     // console.log('partner_token', partner_token);
-    
-    if(WIDGET.partner_token){
+
+    if (WIDGET.partner_token) {
       commonStore.data_client = await WIDGET.getClientInfo()
       // const data = await decodeClientV2({
       //   access_token: queryString('partner_token'),
@@ -177,15 +184,14 @@ async function decodeClient(){
       //   secret_key: $env.secret_key
       // })
       // commonStore.data_client = data.data
-    }else{
+    } else {
       commonStore.data_client = await WIDGET.decodeClient()
-    } 
-  }catch (error) {
+    }
+  } catch (error) {
     throw error
     console.log('getDataClient', error)
   }
 }
-
 </script>
 
 <style lang="scss">

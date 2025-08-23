@@ -1,6 +1,5 @@
 /** hàm xử lý các logic liên quan đến trang preview */
 export function useAutoCreate() {
-
   /** hàm gửi sự kiện đến trang preview */
   function sendPreviewEvent(data: any) {
     /** dữ liệu gửi cho app chatbot Native */
@@ -34,7 +33,8 @@ export function useAutoCreate() {
       console.log('[App] Nhận event từ Frame:::', event.data)
 
       /** dữ liệu tự động tạo ghi chú được gửi từ app chatbot Native */
-      const AUTO_CREATE_NOTE_EVENT = JSON.parse(event.data)
+      const AUTO_CREATE_NOTE_EVENT =
+        typeof event.data === 'string' ? JSON.parse(event.data) : event.data
 
       // nếu sự kiện không phải là preview thì bỏ qua
       if (

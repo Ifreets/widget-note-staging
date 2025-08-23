@@ -43,7 +43,11 @@
 //* import function
 import { request } from '@/services/request'
 import { apiGetInfoContact, apiGetInfoMerchant } from '@/services/api/merchant'
-import { useAppStore, useCommonStore, useMerchantStore } from '@/services/stores'
+import {
+  useAppStore,
+  useCommonStore,
+  useMerchantStore,
+} from '@/services/stores'
 
 //* import library
 import { onMounted, ref } from 'vue'
@@ -62,7 +66,12 @@ const merchantStore = useMerchantStore()
 const create_note = ref<InstanceType<typeof CreateNote>>()
 
 //lấy danh sách khi nhận thông báo từ chatbox
-WIDGET.onEvent(async () => {
+WIDGET.onEvent(async (e: any, data: any) => {
+  /** dữ liệu tự động tạo ghi chú được gửi từ app chatbot Native */
+  const DATA = typeof data === 'string' ? JSON.parse(data) : data
+
+  // nếu sự kiện không phải là reload thì bỏ qua
+  if (DATA.type !== 'RELOAD' || DATA.from !== 'CHATBOX') return
   getNoteList()
   if (appStore.tab_selected === 'CREATE_NEW') changeTab('NOTE_LIST')
   appStore.note_content = ''
@@ -139,19 +148,18 @@ async function getMerchantToken() {
       body: {
         client_id: WIDGET.client_id || '',
         access_token: WIDGET.partner_token || WIDGET.access_token || '',
-        secret_key: $env.secret_key
+        secret_key: $env.secret_key,
       },
     })
 
     // nếu có token thì lưu vào store
     if (result?.data?.access_token) {
       merchantStore.merchant_token = result.data.access_token
-    } 
+    }
     // nếu không có thì log lỗi
     else {
       console.log('Không lấy được token merchant')
     }
-
   } catch (error) {
     console.log('get merchant token', error)
   }
@@ -167,15 +175,13 @@ async function getContact() {
     // nếu có id contact thì lưu vào store
     if (result?.id) {
       merchantStore.contact_id = result.id
-    } 
+    }
     // nếu không có thì log lỗi
     else {
       console.log('Không lấy được id contact')
     }
-    
   } catch (error) {
     console.log('get contact', error)
   }
 }
-
 </script>
