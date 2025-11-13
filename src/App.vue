@@ -57,6 +57,7 @@ onMounted(() => {
 
   // gửi sự kiện đến chatbot để lấy dữ liệu
   sendPreviewEvent({
+    from: 'WIDGET_NOTE'
     type: 'get.data',
   })
 
