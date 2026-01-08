@@ -6,12 +6,12 @@
     v-if="avatar"
     :src="avatar"
     :alt="$props.public_profile?.client_name || 'Avatar'"
-    class="w-full h-full overflow-hidden bg-slate-200 rounded-oval"
+    class="w-full h-full overflow-hidden bg-slate-200 rounded-oval object-cover"
   />
   <div
     v-else-if="comment"
     :class="animate_pulse"
-    class="overflow-hidden bg-slate-200 rounded-oval"
+    class="overflow-hidden bg-slate-200 rounded-oval object-cover"
   >
     <img
       @error="onImageError"
@@ -19,20 +19,20 @@
       loading="lazy"
       :src="$main.loadCommentFromAvatar()"
       :alt="comment?.from?.name || 'Avatar'"
-      class="w-full h-full"
+      class="w-full h-full rounded-oval object-cover"
     />
   </div>
   <div
     v-else
     :class="animate_pulse"
-    class="overflow-hidden bg-slate-200 rounded-oval"
+    class="overflow-hidden bg-slate-200 rounded-oval object-cover"
   >
     <div
       v-if="
         $props.public_profile?.client_name && getPlatformType() === 'WEBSITE'
       "
       :style="{ background: letterToColorCode() }"
-      class="w-full h-full flex justify-center items-center font-semibold text-white"
+      class="w-full h-full flex justify-center items-center font-semibold text-white rounded-oval"
     >
       {{ nameToLetter($props.public_profile?.client_name || "") }}
     </div>
@@ -43,7 +43,7 @@
       loading="lazy"
       :src="loadImageUrl()"
       :alt="$props.public_profile?.client_name || 'Avatar'"
-      class="w-full h-full"
+      class="w-full h-full rounded-oval object-cover"
     />
     <img
       v-else-if="getPlatformType() === 'FB_INSTAGRAM'"
@@ -52,7 +52,7 @@
       loading="lazy"
       :src="loadImageUrl('FB_INSTAGRAM')"
       :alt="$props.public_profile?.client_name || 'Avatar'"
-      class="w-full h-full"
+      class="w-full h-full rounded-oval object-cover"
     />
     <img
       v-else-if="getPlatformType() === 'TIKTOK'"
@@ -61,7 +61,7 @@
       loading="lazy"
       :src="loadImageUrl('TIKTOK')"
       :alt="$props.public_profile?.client_name || 'Avatar'"
-      class="w-full h-full"
+      class="w-full h-full rounded-oval object-cover"
     />
     <img
       v-else-if="getPlatformType() === 'ZALO_OA' && getClientAvatar()"
@@ -70,7 +70,7 @@
       loading="lazy"
       :src="getClientAvatar()"
       :alt="$props.public_profile?.client_name || 'Avatar'"
-      class="w-full h-full"
+      class="w-full h-full rounded-oval object-cover"
     />
     <img
       v-else-if="getPlatformType() === 'ZALO_PERSONAL' && getClientAvatar()"
@@ -79,12 +79,12 @@
       loading="lazy"
       :src="getClientAvatar()"
       :alt="$props.public_profile?.client_name || 'Avatar'"
-      class="w-full h-full"
+      class="w-full h-full rounded-oval object-cover"
     />
     <div
       v-else
       :style="{ background: letterToColorCode() }"
-      class="w-full h-full flex justify-center items-center font-semibold text-white"
+      class="w-full h-full flex justify-center items-center font-semibold text-white rounded-oval"
     >
       {{ nameToLetter($props.public_profile?.client_name || "") }}
     </div>
