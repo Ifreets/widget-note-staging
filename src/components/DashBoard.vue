@@ -24,10 +24,16 @@
         >
           ( {{ $t("guide") }} )
         </label>
-        <img
-          :src="commonStore.getUserAvatar()"
-          class="w-6 h-6 absolute top-1 right-1 rounded-md"
-        />
+        <div class="w-6 h-6 absolute top-1 right-1 rounded-md">
+          <UserAvatar
+            :public_profile="commonStore.data_client?.public_profile"
+            :platform_type="
+              (commonStore.data_client as any)?.conversation_message
+                ?.platform_type
+            "
+            :actual_size="12"
+          />
+        </div>
       </div>
       <!-- List tabs -->
       <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
@@ -61,6 +67,7 @@ import WIDGET from "bbh-chatbox-widget-js-sdk";
 import NoteList from "@/components/NoteList.vue";
 import CreateNote from "@/components/CreateNote.vue";
 import InputSkeleton from "@/components/InputSkeleton.vue";
+import UserAvatar from "@/components/UserAvatar.vue";
 
 // stores
 const appStore = useAppStore();
