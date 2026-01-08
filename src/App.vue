@@ -2,7 +2,6 @@
   <div id="app">
     <DashBoard v-if="!active_app" />
     <ActiveWidget v-if="active_app" />
-    <Loading type="FULL" v-if="appStore.is_loading" />
   </div>
 </template>
 
@@ -20,7 +19,6 @@ import { onMounted, ref } from "vue";
 // * import component
 import DashBoard from "@/components/DashBoard.vue";
 import ActiveWidget from "@/components/ActiveWidget.vue";
-import Loading from "@/components/Loading.vue";
 import { set } from "lodash";
 
 // let url_string = window.location.href
