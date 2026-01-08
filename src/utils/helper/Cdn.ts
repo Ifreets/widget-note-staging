@@ -107,7 +107,7 @@ export interface ICdn {
 @singleton()
 export class Cdn implements ICdn {
   /**Host media cdn */
-  constructor(private readonly HOST = "https://cdn.botbanhang.vn") {}
+  constructor(private readonly HOST = import.meta.env.VITE_MEIDA_CDN) {}
 
   fbPageAvt(page_id?: string) {
     return `${this.HOST}/media/fb/${page_id}/page`;
