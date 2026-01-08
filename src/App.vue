@@ -93,6 +93,7 @@ onMounted(() => {
 
 /** hàm tự động tạo ghi chú */
 function autoCreate() {
+  /** thời gian hẹn lịch */
   let param_date = queryString("datetime") || "";
   let note_content = queryString("note") || "";
 
