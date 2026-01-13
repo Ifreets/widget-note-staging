@@ -11,13 +11,13 @@
         <div
           class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"
         ></div>
-        <span class="ms-3 text-sm font-medium">{{ $t('reminder') }}</span>
+        <span class="ms-3 text-sm font-medium">{{ $t("reminder") }}</span>
       </label>
     </div>
     <div class="select-calendar flex gap-2" v-if="is_remind">
       <div class="w-8/12 flex flex-col gap-1">
         <label class="text-xs text-gray-500">
-          {{ $t('time') }}
+          {{ $t("time") }}
           <span class="text-red-500">*</span>
         </label>
         <CustomDatepicker
@@ -27,7 +27,7 @@
         />
       </div>
       <div class="w-4/12 flex flex-col gap-1">
-        <label class="text-xs text-gray-500">{{ $t('frequency') }}</label>
+        <label class="text-xs text-gray-500">{{ $t("frequency") }}</label>
         <select
           v-model="frequency_selected"
           class="border px-2.5 rounded outline-none h-full bg-white"
@@ -51,17 +51,19 @@
         class="w-1/4 text-center cursor-pointer hover:font-bold"
         @click="closeCreate()"
       >
-        {{ $t('close') }}
+        {{ $t("close") }}
       </div>
       <div
         class="w-3/4 text-center text-white py-2 rounded-md cursor-pointer hover:shadow-md hover:shadow-black/20"
         :class="
-          props.input_content ? 'bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+          props.input_content && !is_loading_create
+            ? 'bg-blue-700'
+            : 'bg-gray-400 cursor-not-allowed'
         "
         @click="createNewNote()"
       >
-        <span v-if="appStore.isUpdateNote()">{{ $t('update') }}</span>
-        <span v-else>{{ is_remind ? $t('create_reminder') : $t('save') }}</span>
+        <span v-if="appStore.isUpdateNote()">{{ $t("update") }}</span>
+        <span v-else>{{ is_remind ? $t("create_reminder") : $t("save") }}</span>
       </div>
     </div>
   </div>
@@ -69,102 +71,109 @@
 
 <script setup lang="ts">
 //* import function
-import { useAppStore, useCommonStore, useMerchantStore } from '@/services/stores'
-import { request } from '@/services/request'
-import { add } from 'date-fns/add'
+import {
+  useAppStore,
+  useCommonStore,
+  useMerchantStore,
+} from "@/services/stores";
+import { request } from "@/services/request";
+import { add } from "date-fns/add";
 
 // * import library
-import { ref, onMounted } from 'vue'
-import { Toast } from '@/services/toast'
-import { useI18n } from 'vue-i18n'
-import { getHours } from 'date-fns/getHours'
-import { getMinutes } from 'date-fns/getMinutes'
-import { checkDate, queryString } from '@/services/helper'
+import { ref, onMounted } from "vue";
+import { Toast } from "@/services/toast";
+import { useI18n } from "vue-i18n";
+import { getHours } from "date-fns/getHours";
+import { getMinutes } from "date-fns/getMinutes";
+import { checkDate, queryString } from "@/services/helper";
 
 //* import component
-import CustomDatepicker from '@/components/CustomDatepicker.vue'
+import CustomDatepicker from "@/components/CustomDatepicker.vue";
 
 // * import constant
-import { FREQUENCY } from '@/services/constant/create_note'
-import { apiCreateNoteContact } from '@/services/api/merchant'
+import { FREQUENCY } from "@/services/constant/create_note";
+import { apiCreateNoteContact } from "@/services/api/merchant";
 
 //* store
-const appStore = useAppStore()
-const commonStore = useCommonStore()
+const appStore = useAppStore();
+const commonStore = useCommonStore();
 // * props
 const props = defineProps({
   /** Nội dung của ghi chú */
   input_content: String,
-})
+});
 
 // * khởi tạo thông báo
-const $toast = new Toast()
+const $toast = new Toast();
 
 //* i18n
-const { t } = useI18n()
+const { t } = useI18n();
 
 // * emits
-const emit = defineEmits(['update:input_content', 'changeTab'])
+const emit = defineEmits(["update:input_content", "changeTab"]);
 
 /** tần suất được chọn */
-const frequency_selected = ref<string>(initFrequency())
+const frequency_selected = ref<string>(initFrequency());
 
 /** bật/tắt chế độ nhắc lịch */
-const is_remind = ref<boolean>(initIsRemind())
+const is_remind = ref<boolean>(initIsRemind());
 
 /** ngày đặt lịch */
-const date_value = ref<Date>(initDate())
+const date_value = ref<Date>(initDate());
 
 /** giờ đặt lịch */
-const time_value = ref<{ hour: number; minute: number }>(initTime())
+const time_value = ref<{ hour: number; minute: number }>(initTime());
+
+/** trạng thái loading khi tạo */
+const is_loading_create = ref(false);
 
 onMounted(() => {
   // lấy data từ query string
-  let param_date = queryString('datetime') || ''
-  let note_content = queryString('note') || ''
+  let param_date = queryString("datetime") || "";
+  let note_content = queryString("note") || "";
 
-  const partner_token = queryString('partner_token')
+  const partner_token = queryString("partner_token");
 
   if (partner_token) {
     param_date =
       commonStore?.data_client?.public_profile?.ai?.[0]?.ctas?.schedule_appointment?.datetime?.toString() ||
-      ''
+      "";
     note_content =
       commonStore?.data_client?.public_profile?.ai?.[0]?.ctas
-        ?.schedule_appointment?.input_message || ''
+        ?.schedule_appointment?.input_message || "";
   }
 
   // nếu có nội dung từ param thì sẽ lấy thêm các data từ đó để khởi tạo ghi chú
   if (appStore.is_auto_create) {
     // set nội dung
-    appStore.note_content = note_content?.replace('\\n', '\n') || ''
+    appStore.note_content = note_content?.replace("\\n", "\n") || "";
 
     // tắt cờ khởi tạo data từ param
-    appStore.is_auto_create = false
+    appStore.is_auto_create = false;
 
-    if (!param_date) return
+    if (!param_date) return;
 
     // bật nhắc lịch
-    is_remind.value = true
+    is_remind.value = true;
 
     // nếu thời gian hẹn lịch lớn hơn thời gian hiện tại thì lưu lại
     if (checkDate(param_date)) {
       // set thời gian
-      date_value.value = new Date(Number(param_date))
+      date_value.value = new Date(Number(param_date));
     }
     // không thì sẽ set thời gian hẹn lịch là 1 giờ so với thời gian hiện tại
     else {
       // set thời gian
-      date_value.value = add(new Date(), { hours: 1 })
+      date_value.value = add(new Date(), { hours: 1 });
     }
 
     // set giờ
     time_value.value = {
       hour: getHours(date_value.value),
       minute: getMinutes(date_value.value),
-    }
+    };
   }
-})
+});
 
 /** hàm khởi tạo giá trị tần suất */
 function initFrequency() {
@@ -175,8 +184,8 @@ function initFrequency() {
     appStore.selectedNote()?.frequency
   )
     // trả về giá trị tần suất của ghi chú chọn để sửa
-    return appStore.selectedNote()?.frequency || ''
-  return 'NONE'
+    return appStore.selectedNote()?.frequency || "";
+  return "NONE";
 }
 
 /** hàm khởi tạo giá trị cho bật/tắt nhắc lịch */
@@ -187,8 +196,8 @@ function initIsRemind() {
     // kiểm tra có tồn tại thời gian đặt lịch không
     appStore.selectedNote()?.schedule_time
   )
-    return true
-  return false
+    return true;
+  return false;
 }
 
 /** hàm khởi tạo giá trị cho ngày đặt lịch */
@@ -199,18 +208,18 @@ function initDate() {
     // kiểm tra xem có tồn tại ngày đặt lịch không
     appStore.selectedNote()?.schedule_time
   ) {
-    return new Date(appStore.selectedNote()?.schedule_time || 0)
+    return new Date(appStore.selectedNote()?.schedule_time || 0);
   }
-  return getCurrentDate()
+  return getCurrentDate();
 }
 
 /** hàm khởi tạo giá trị cho thời gian đặt lịch */
 function initTime() {
   // lấy thời gian hiện tại
-  let currrent_date = new Date()
+  let currrent_date = new Date();
 
   /** thời gian đặt lịch */
-  const SCHEDULE_TIME = appStore.selectedNote()?.schedule_time
+  const SCHEDULE_TIME = appStore.selectedNote()?.schedule_time;
 
   if (
     // kiểm tra xem có phải chế độ sửa không, nếu khác -1 là chế độ sửa
@@ -219,67 +228,69 @@ function initTime() {
     SCHEDULE_TIME
   ) {
     /** số giờ của thời gian đặt lịch */
-    const SCHEDULE_HOUR = getHours(SCHEDULE_TIME)
+    const SCHEDULE_HOUR = getHours(SCHEDULE_TIME);
     /** số phút của thời gian đặt lịch */
-    const SCHEDULE_MINUTE = getMinutes(SCHEDULE_TIME)
-    
+    const SCHEDULE_MINUTE = getMinutes(SCHEDULE_TIME);
 
     return {
       hour: SCHEDULE_HOUR || 0,
       minute: SCHEDULE_MINUTE || 0,
-    }
+    };
   }
   // nếu không tồn tại trả về giờ và phút hiện tại
-  return { hour: currrent_date.getHours(), minute: currrent_date.getMinutes() }
+  return { hour: currrent_date.getHours(), minute: currrent_date.getMinutes() };
 }
 
 /** hàm đóng tab tạo mới ghi chú */
 function closeCreate() {
   // thiết lập nội dung của ô nhập nội dung ghi chú về trống
-  emit('update:input_content', '')
+  emit("update:input_content", "");
   // chuyển sáng tab danh sách ghi chú
-  emit('changeTab', 'NOTE_LIST')
+  emit("changeTab", "NOTE_LIST");
   // xóa số thứ tự của ghi chú nếu đang sửa 1 ghi chú nào đó
-  appStore.note_index = -1
+  appStore.note_index = -1;
 }
 
 /** hàm lấy ngày hôm nay tại lúc 0 giờ 0 phút 0 giây */
 function getCurrentDate() {
-  return new Date()
+  return new Date();
 }
 
 /** hàm tạo thời gian đặt lịch với giờ và ngày đã chọn */
 function getDateTime(hour: number, minute: number, date: number): number {
   // chuyển từ timestamp sang Date
-  let date_temp = new Date(date)
+  let date_temp = new Date(date);
   // tạo chuỗi date có dạng yyyy/mm/dd
   let date_string = `${date_temp.getFullYear()}/${
     date_temp.getMonth() + 1
-  }/${date_temp.getDate()}`
+  }/${date_temp.getDate()}`;
   // tao chuỗi time có dạng hh:mm
-  let time_string = `${hour}:${minute}`
+  let time_string = `${hour}:${minute}`;
 
   // trả về giá trị timestamp của ngày và giờ được truyền vào
-  return new Date(date_string + ' ' + time_string).getTime()
+  return new Date(date_string + " " + time_string).getTime();
 }
 
 /** hàm tạo ghi chú mới */
 async function createNewNote() {
   try {
+    // nếu đang loading thì chặn
+    if (is_loading_create.value) return;
     // nếu chưa nhập nội dung ghi chú thì không thực hiện
-    if (!props.input_content) return
+    if (!props.input_content) return;
 
     //bật loading
-    appStore.is_loading = true
+    is_loading_create.value = true;
+    appStore.is_loading = true;
 
     // call api tạo mới note hoặc sửa note
     let result = await request({
       // nếu số thứ tự của sửa ghi chú tồn tại thì sử dụng endpoint sửa
       // nếu không thì sử dụng endpoint tạo ghi chú
-      path: appStore.isUpdateNote() ? '/v1/note/update' : '/v1/note/create',
+      path: appStore.isUpdateNote() ? "/v1/note/update" : "/v1/note/create",
       body: {
         _id: appStore.isUpdateNote() ? appStore.selectedNote()?._id : null,
-        label: 'note',
+        label: "note",
         content: props.input_content,
         schedule_time: is_remind.value
           ? getDateTime(
@@ -292,18 +303,18 @@ async function createNewNote() {
         fb_staff_id: commonStore.data_client?.public_profile?.current_user_id,
         staff_name: commonStore.data_client?.public_profile?.current_staff_name,
       },
-      method: 'POST',
+      method: "POST",
       json: true,
-    })
-    if (!(result.code === 200)) throw result.message
+    });
+    if (!(result.code === 200)) throw result.message;
 
     // kiểm tra có phải tạo mới ghi chú không
     if (!appStore.isUpdateNote()) {
       // thêm ghi chú mới tạo vào danh sách ghi chú
-      appStore.note_list = [result.data, ...appStore.note_list]
+      appStore.note_list = [result.data, ...appStore.note_list];
     } else {
       // sửa ghi chú trong danh sách ghi chú
-      appStore.note_list[appStore.note_index] = result.data
+      appStore.note_list[appStore.note_index] = result.data;
     }
 
     // nếu là tạo mới call api tạo ghi chú bên app contact
@@ -312,30 +323,32 @@ async function createNewNote() {
         body: {
           contact_id: useMerchantStore().contact_id,
           content: props.input_content,
-          is_template:false,
+          is_template: false,
         },
-      })
+      });
     }
 
     //tắt loading
-    appStore.is_loading = false
+    appStore.is_loading = false;
+    is_loading_create.value = false;
     // thông báo thành công
     $toast.success(
-      appStore.isUpdateNote() ? t('update_sucess') : t('create_new_success'),
-      'right',
-      'top'
-    )
+      appStore.isUpdateNote() ? t("update_sucess") : t("create_new_success"),
+      "right",
+      "top"
+    );
     //tạo thành công thì clear các input và chuyển sang tab danh sách ghi chú
-    closeCreate()
+    closeCreate();
   } catch (error) {
-    console.log(error)
+    console.log(error);
     // thông báo thất bại
-    $toast.error('Tạo thất bại', 'right', 'top')
+    $toast.error("Tạo thất bại", "right", "top");
     // tắt loading
-    appStore.is_loading = false
+    appStore.is_loading = false;
+    is_loading_create.value = false;
   }
 }
 
 // xuất hàm tạo ghi chú
-defineExpose({ createNewNote })
+defineExpose({ createNewNote });
 </script>
