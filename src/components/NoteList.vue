@@ -1,24 +1,58 @@
 <template>
+  <!-- Skeleton khi đang loading -->
+  <NoteListSkeleton v-if="appStore.is_loading" />
+
+  <!-- Danh sách ghi chú khi không loading -->
   <div
+    v-else
     class="body-schedule-list h-full overflow-y-auto scrollbar-thin flex flex-col gap-2"
   >
-    <!-- Skeleton loading -->
-    <template v-if="is_loading">
-      <div
-        class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg animate-pulse"
-        v-for="i in 5"
-        :key="i"
-      >
-        <div class="flex justify-between">
-          <div class="h-3 bg-slate-300 rounded w-20"></div>
-          <div class="h-3 bg-slate-300 rounded w-16"></div>
-        </div>
-        <div class="flex items-start gap-2 mt-1">
-          <div class="w-4 h-4 rounded-full bg-slate-300"></div>
-          <div class="flex-1 flex flex-col gap-1">
-            <div class="h-3 bg-slate-300 rounded w-3/4"></div>
-            <div class="h-3 bg-slate-300 rounded w-1/2"></div>
-          </div>
+    <div
+      class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm cursor-pointer hover:bg-slate-200"
+      v-for="(item, index) in appStore.note_list"
+      :key="index"
+      v-if="appStore.note_list.length"
+      @click="editNote(item, index)"
+    >
+      <div class="flex justify-between text-xs">
+        <!-- :class="{
+            'font-medium': !item.finished && item.schedule_time,
+          }" -->
+        <span class="font-medium">
+          {{ item.createdAt ? convertTimeList(item.createdAt) : "" }}
+        </span>
+
+        <span
+          class="text-green-600 font-semibold"
+          v-show="item.finished && item.schedule_time"
+        >
+          {{ $t("finished") }}
+        </span>
+
+        <span
+          class="text-orange-700 font-semibold"
+          v-show="!item.finished && item.schedule_time && !item.is_remove"
+        >
+          {{ item.schedule_time && showTimeMore(item.schedule_time) }}
+        </span>
+
+        <span class="text-black font-semibold" v-show="item.is_remove">
+          {{ $t("clear_calendar") }}
+        </span>
+      </div>
+      <div class="flex items-start gap-2">
+        <img v-if="item.schedule_time" :src="CalendarIcon" />
+        <img v-else :src="NoteIcon" />
+        <div>
+          <p
+            :class="{
+              'line-through': item.finished,
+              // 'text-red-500': !item.watched && item.finished,
+            }"
+            class="truncate w-60 sm:w-72 whitespace-pre-line"
+          >
+            {{ item?.content }}
+          </p>
         </div>
       </div>
     </template>
@@ -96,6 +130,9 @@ import { useAppStore } from "@/services/stores";
 //* import library
 import { useI18n } from "vue-i18n";
 
+//* import component
+import NoteListSkeleton from "@/components/NoteListSkeleton.vue";
+
 //* import icon
 import NoteIcon from "@/assets/note.svg";
 import CalendarIcon from "@/assets/calendar.svg";
@@ -107,11 +144,6 @@ const { t } = useI18n();
 
 // * store
 const appStore = useAppStore();
-
-// * props
-const props = defineProps({
-  is_loading: Boolean,
-});
 
 /** hàm tính thời gian còn lại cho tới thời gian đặt lịch */
 function showTimeMore(value: number): string {

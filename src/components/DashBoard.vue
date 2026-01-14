@@ -3,7 +3,11 @@
     <div
       class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white"
     >
-      <div class="min-h-max relative w-full">
+      <!-- Skeleton cho input khi đang loading client data -->
+      <InputSkeleton v-if="commonStore.is_loading_full_screen" />
+
+      <!-- Input thật khi đã có data -->
+      <div v-else class="min-h-max relative w-full">
         <textarea
           id="content_note"
           class="w-full h-full border rounded-md min-h-16 py-1.5 pl-3 pr-9 outline-none text-sm resize-y placeholder:text-slate-400 placeholder:truncate"
@@ -20,10 +24,16 @@
         >
           ( {{ $t("guide") }} )
         </label>
-        <img
-          :src="commonStore.getUserAvatar()"
-          class="w-6 h-6 absolute top-1 right-1 rounded-md"
-        />
+        <div class="w-6 h-6 absolute top-1 right-1 rounded-md">
+          <UserAvatar
+            :public_profile="commonStore.data_client?.public_profile"
+            :platform_type="
+              (commonStore.data_client as any)?.conversation_message
+                ?.platform_type
+            "
+            :actual_size="12"
+          />
+        </div>
       </div>
       <!-- List tabs -->
       <NoteList
@@ -59,6 +69,8 @@ import WIDGET from "bbh-chatbox-widget-js-sdk";
 //* import components
 import NoteList from "@/components/NoteList.vue";
 import CreateNote from "@/components/CreateNote.vue";
+import InputSkeleton from "@/components/InputSkeleton.vue";
+import UserAvatar from "@/components/UserAvatar.vue";
 
 // stores
 const appStore = useAppStore();
@@ -67,9 +79,6 @@ const merchantStore = useMerchantStore();
 
 /** ref tới component CreateNote */
 const create_note = ref<InstanceType<typeof CreateNote>>();
-
-/** trạng thái loading của danh sách ghi chú */
-const is_loading_list = ref(false);
 
 //lấy danh sách khi nhận thông báo từ chatbox
 WIDGET.onEvent(async (e: any, data: any) => {
@@ -113,7 +122,7 @@ function handleKeyUp(event: any) {
 async function getNoteList() {
   try {
     //bật loading
-    is_loading_list.value = true;
+    appStore.is_loading = true;
 
     // call api lấy danh sách ghi chú
     let result = await request({
@@ -124,14 +133,14 @@ async function getNoteList() {
     });
 
     //tắt loading
-    is_loading_list.value = false;
+    appStore.is_loading = false;
 
     //lưu danh sách ghi chú vào store
     appStore.note_list = result.data;
   } catch (error) {
     console.log("get note list", error);
     //tắt loading
-    is_loading_list.value = false;
+    appStore.is_loading = false;
   }
 }
 
