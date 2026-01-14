@@ -36,10 +36,7 @@
         </div>
       </div>
       <!-- List tabs -->
-      <NoteList
-        v-if="appStore.tab_selected === 'NOTE_LIST'"
-        :is_loading="is_loading_list"
-      />
+      <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
 
       <!-- Create tabs -->
       <CreateNote

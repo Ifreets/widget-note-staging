@@ -55,69 +55,18 @@
           </p>
         </div>
       </div>
-    </template>
 
-    <template v-else>
       <div
-        class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm cursor-pointer hover:bg-slate-200"
-        v-for="(item, index) in appStore.note_list"
-        :key="index"
-        v-if="appStore.note_list.length"
-        @click="editNote(item, index)"
+        class="w-full h-60 flex items-center justify-center flex-col"
+        v-if="!appStore.note_list.length && !appStore.is_loading"
       >
-        <div class="flex justify-between text-xs">
-          <!-- :class="{
-              'font-medium': !item.finished && item.schedule_time,
-            }" -->
-          <span class="font-medium">
-            {{ item.createdAt ? convertTimeList(item.createdAt) : "" }}
-          </span>
-
-          <span
-            class="text-green-600 font-semibold"
-            v-show="item.finished && item.schedule_time"
-          >
-            {{ $t("finished") }}
-          </span>
-
-          <span
-            class="text-orange-700 font-semibold"
-            v-show="!item.finished && item.schedule_time && !item.is_remove"
-          >
-            {{ item.schedule_time && showTimeMore(item.schedule_time) }}
-          </span>
-
-          <span class="text-black font-semibold" v-show="item.is_remove">
-            {{ $t("clear_calendar") }}
-          </span>
+        <div class="bg-slate-100 rounded-full p-6">
+          <img class="w-9 h-9" src="./../assets/empty.svg" alt="" />
         </div>
-        <div class="flex items-start gap-2">
-          <img v-if="item.schedule_time" :src="CalendarIcon" />
-          <img v-else :src="NoteIcon" />
-          <div>
-            <p
-              :class="{
-                'line-through': item.finished,
-                // 'text-red-500': !item.watched && item.finished,
-              }"
-              class="truncate w-60 sm:w-72 whitespace-pre-line"
-            >
-              {{ item?.content }}
-            </p>
-          </div>
-        </div>
+        <p class="text-gray-500 font-medium mt-2">
+          {{ $t("none_note") }}
+        </p>
       </div>
-    </template>
-    <div
-      class="w-full h-60 flex items-center justify-center flex-col"
-      v-if="!appStore.note_list.length && !is_loading"
-    >
-      <div class="bg-slate-100 rounded-full p-6">
-        <img class="w-9 h-9" src="./../assets/empty.svg" alt="" />
-      </div>
-      <p class="text-gray-500 font-medium mt-2">
-        {{ $t("none_note") }}
-      </p>
     </div>
   </div>
 </template>
