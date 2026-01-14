@@ -281,7 +281,6 @@ async function createNewNote() {
 
     //bật loading
     is_loading_create.value = true;
-    appStore.is_loading = true;
 
     // call api tạo mới note hoặc sửa note
     let result = await request({
@@ -329,7 +328,6 @@ async function createNewNote() {
     }
 
     //tắt loading
-    appStore.is_loading = false;
     is_loading_create.value = false;
     // thông báo thành công
     $toast.success(
@@ -344,7 +342,6 @@ async function createNewNote() {
     // thông báo thất bại
     $toast.error("Tạo thất bại", "right", "top");
     // tắt loading
-    appStore.is_loading = false;
     is_loading_create.value = false;
   }
 }

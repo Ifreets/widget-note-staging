@@ -18,7 +18,7 @@
           class="absolute top-6 left-0 text-slate-400 px-3.5 py-1.5 -z-1"
           for="content_note"
         >
-          ( {{ $t('guide') }} )
+          ( {{ $t("guide") }} )
         </label>
         <img
           :src="commonStore.getUserAvatar()"
@@ -26,7 +26,10 @@
         />
       </div>
       <!-- List tabs -->
-      <NoteList v-if="appStore.tab_selected === 'NOTE_LIST'" />
+      <NoteList
+        v-if="appStore.tab_selected === 'NOTE_LIST'"
+        :is_loading="is_loading_list"
+      />
 
       <!-- Create tabs -->
       <CreateNote
@@ -41,103 +44,106 @@
 
 <script setup lang="ts">
 //* import function
-import { request } from '@/services/request'
-import { apiGetInfoContact, apiGetInfoMerchant } from '@/services/api/merchant'
+import { request } from "@/services/request";
+import { apiGetInfoContact, apiGetInfoMerchant } from "@/services/api/merchant";
 import {
   useAppStore,
   useCommonStore,
   useMerchantStore,
-} from '@/services/stores'
+} from "@/services/stores";
 
 //* import library
-import { onMounted, ref } from 'vue'
-import WIDGET from 'bbh-chatbox-widget-js-sdk'
+import { onMounted, ref } from "vue";
+import WIDGET from "bbh-chatbox-widget-js-sdk";
 
 //* import components
-import NoteList from '@/components/NoteList.vue'
-import CreateNote from '@/components/CreateNote.vue'
+import NoteList from "@/components/NoteList.vue";
+import CreateNote from "@/components/CreateNote.vue";
 
 // stores
-const appStore = useAppStore()
-const commonStore = useCommonStore()
-const merchantStore = useMerchantStore()
+const appStore = useAppStore();
+const commonStore = useCommonStore();
+const merchantStore = useMerchantStore();
 
 /** ref tới component CreateNote */
-const create_note = ref<InstanceType<typeof CreateNote>>()
+const create_note = ref<InstanceType<typeof CreateNote>>();
+
+/** trạng thái loading của danh sách ghi chú */
+const is_loading_list = ref(false);
 
 //lấy danh sách khi nhận thông báo từ chatbox
 WIDGET.onEvent(async (e: any, data: any) => {
   /** dữ liệu tự động tạo ghi chú được gửi từ app chatbot Native */
-  const DATA = typeof data === 'string' ? JSON.parse(data) : data
+  const DATA = typeof data === "string" ? JSON.parse(data) : data;
 
   // nếu sự kiện không phải là reload thì bỏ qua
-  if (DATA.type !== 'RELOAD' || DATA.from !== 'CHATBOX') return
-  getNoteList()
-  if (appStore.tab_selected === 'CREATE_NEW') changeTab('NOTE_LIST')
-  appStore.note_content = ''
-})
+  if (DATA.type !== "RELOAD" || DATA.from !== "CHATBOX") return;
+  getNoteList();
+  if (appStore.tab_selected === "CREATE_NEW") changeTab("NOTE_LIST");
+  appStore.note_content = "";
+});
 onMounted(() => {
   //lấy danh sách khi bật app
-  getNoteList()
+  getNoteList();
   // lấy dữ liệu merchant
-  getDataMerchant()
-})
+  getDataMerchant();
+});
 
 /** hàm chuyển tab */
-function changeTab(tab: 'NOTE_LIST' | 'CREATE_NEW') {
-  appStore.tab_selected = tab
+function changeTab(tab: "NOTE_LIST" | "CREATE_NEW") {
+  appStore.tab_selected = tab;
 }
 
 /** hàm bắt sự kiện gõ phím ở ô nhập nội dung ghi chứ */
 function handleKeyUp(event: any) {
   // nếu có nội dung ghi chú thi chuyển sang tab tạo ghi chú
-  if (appStore.note_content) changeTab('CREATE_NEW')
+  if (appStore.note_content) changeTab("CREATE_NEW");
 
   // nếu không nhấn shift + enter thì không thực hiện gì
-  if (!event.shiftKey || !(event.keyCode === 13)) return
+  if (!event.shiftKey || !(event.keyCode === 13)) return;
 
   // nếu nhấn shift + enter và có nội dung ghi chứ thì tạo ghi chú
-  if (!appStore.note_content) return
+  if (!appStore.note_content) return;
 
   // Sử dụng tham chiếu để gọi hàm createNewNote trong component con
-  create_note.value?.createNewNote()
+  create_note.value?.createNewNote();
 }
 
 /** hàm lấy danh sách ghi chú */
 async function getNoteList() {
   try {
     //bật loading
-    appStore.is_loading = true
+    is_loading_list.value = true;
 
     // call api lấy danh sách ghi chú
     let result = await request({
-      path: '/v1/note/read',
+      path: "/v1/note/read",
       body: {},
-      method: 'POST',
+      method: "POST",
       json: true,
-    })
+    });
 
     //tắt loading
-    appStore.is_loading = false
+    is_loading_list.value = false;
 
     //lưu danh sách ghi chú vào store
-    appStore.note_list = result.data
+    appStore.note_list = result.data;
   } catch (error) {
-    console.log('get note list', error)
+    console.log("get note list", error);
     //tắt loading
-    appStore.is_loading = false
+    is_loading_list.value = false;
   }
 }
 
 async function getDataMerchant() {
   try {
     // lấy token merchant
-    await getMerchantToken()
+    await getMerchantToken();
 
     // nếu có token thì lấy dữ liệu contact
-    if (merchantStore.merchant_token) getContact()
+    if (merchantStore.merchant_token) getContact();
   } catch (error) {
-    console.log('get data merchant', error)
+    console.log("get data merchant", error);
   }
 }
 
@@ -146,22 +152,22 @@ async function getMerchantToken() {
   try {
     let result = await apiGetInfoMerchant({
       body: {
-        client_id: WIDGET.client_id || '',
-        access_token: WIDGET.partner_token || WIDGET.access_token || '',
+        client_id: WIDGET.client_id || "",
+        access_token: WIDGET.partner_token || WIDGET.access_token || "",
         secret_key: $env.secret_key,
       },
-    })
+    });
 
     // nếu có token thì lưu vào store
     if (result?.data?.access_token) {
-      merchantStore.merchant_token = result.data.access_token
+      merchantStore.merchant_token = result.data.access_token;
     }
     // nếu không có thì log lỗi
     else {
-      console.log('Không lấy được token merchant')
+      console.log("Không lấy được token merchant");
     }
   } catch (error) {
-    console.log('get merchant token', error)
+    console.log("get merchant token", error);
   }
 }
 
@@ -170,18 +176,18 @@ async function getContact() {
   try {
     let result = await apiGetInfoContact({
       body: commonStore.data_client,
-    })
+    });
 
     // nếu có id contact thì lưu vào store
     if (result?.id) {
-      merchantStore.contact_id = result.id
+      merchantStore.contact_id = result.id;
     }
     // nếu không có thì log lỗi
     else {
-      console.log('Không lấy được id contact')
+      console.log("Không lấy được id contact");
     }
   } catch (error) {
-    console.log('get contact', error)
+    console.log("get contact", error);
   }
 }
 </script>
