@@ -1,7 +1,9 @@
 <template>
-  <div class="h-screen w-screen bg-slate-200">
+  <!-- Container gốc: overflow-hidden ngăn scroll toàn page, fixed để chiếm toàn màn hình -->
+  <div class="h-screen w-screen bg-slate-200 overflow-hidden fixed inset-0">
+    <!-- Container content: overscroll-contain ngăn scroll leak ra parent iframe -->
     <div
-      class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white"
+      class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white overflow-y-auto overscroll-contain"
     >
       <!-- Skeleton cho input khi đang loading client data -->
       <InputSkeleton v-if="commonStore.is_loading_full_screen" />
@@ -197,3 +199,13 @@ async function getContact() {
   }
 }
 </script>
+
+<style scoped>
+/** fix scroll leak trên mobile iframe */
+.container {
+  /** ngăn scroll chain lan ra parent */
+  overscroll-behavior: contain;
+  /** tắt touch-action mặc định để kiểm soát hoàn toàn */
+  -webkit-overflow-scrolling: touch;
+}
+</style>
