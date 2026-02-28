@@ -224,5 +224,6 @@ class Main {
     );
   }
 }
-const $main = new Main();
+const MAIN = new Main();
+void MAIN;
 </script>
