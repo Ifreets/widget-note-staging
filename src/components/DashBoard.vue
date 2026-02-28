@@ -1,17 +1,15 @@
 <template>
   <!-- Container gốc: overflow-hidden ngăn scroll toàn page, fixed để chiếm toàn màn hình -->
-  <div
-    class="h-screen w-screen bg-slate-200 overflow-hidden fixed inset-0 overscroll-none"
-  >
+  <div class="h-screen w-screen bg-slate-200 overflow-hidden fixed inset-0">
     <!-- Container content: overscroll-contain ngăn scroll leak ra parent iframe -->
     <div
-      class="container h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white overflow-y-auto overscroll-none"
+      class="h-full w-full md:w-[395px] md:h-[300px] text-sm px-3 py-2 flex flex-col gap-2 bg-white overflow-y-auto"
     >
       <!-- Skeleton cho input khi đang loading client data -->
       <InputSkeleton v-if="commonStore.is_loading_full_screen" />
 
       <!-- Input thật khi đã có data -->
-      <div v-else class="min-h-max relative w-full overscroll-none">
+      <div v-else class="min-h-max relative w-full">
         <textarea
           id="content_note"
           class="w-full h-full border rounded-md min-h-16 py-1.5 pl-3 pr-9 outline-none text-sm resize-y placeholder:text-slate-400 placeholder:truncate"
@@ -206,8 +204,8 @@ async function getContact() {
 /** fix scroll leak trên mobile iframe */
 .container {
   /** ngăn scroll chain lan ra parent */
-  overscroll-behavior: contain;
+  /* overscroll-behavior: contain; */
   /** tắt touch-action mặc định để kiểm soát hoàn toàn */
-  -webkit-overflow-scrolling: touch;
+  /* -webkit-overflow-scrolling: touch; */
 }
 </style>
