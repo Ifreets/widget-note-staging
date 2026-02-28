@@ -8,20 +8,7 @@
     :alt="$props.public_profile?.client_name || 'Avatar'"
     class="w-full h-full overflow-hidden bg-slate-200 rounded-oval object-cover"
   />
-  <div
-    v-else-if="comment"
-    :class="animate_pulse"
-    class="overflow-hidden bg-slate-200 rounded-oval object-cover"
-  >
-    <img
-      @error="onImageError"
-      @load="removeAnimatePulse"
-      loading="lazy"
-      :src="$main.loadCommentFromAvatar()"
-      :alt="comment?.from?.name || 'Avatar'"
-      class="w-full h-full rounded-oval object-cover"
-    />
-  </div>
+
   <div
     v-else
     :class="animate_pulse"
@@ -118,7 +105,7 @@ const $props = withDefaults(
   }>(),
   {
     actual_size: 64,
-  }
+  },
 );
 
 /**thêm hiệu ứng ẩn hiện khi ảnh đang được load */
@@ -200,11 +187,18 @@ function loadImageUrl(platform_type?: PageType) {
 }
 /**khi ảnh load thất bại thì thay thế ảnh mặc định vào */
 function onImageError($event: Event) {
+  /** Thẻ img đang bị lỗi load ảnh */
   const image = $event.target as HTMLImageElement;
 
-  image.src = `${$env.img_host}/1111111111?width=${
-    $props.actual_size * 2
-  }&height=${$props.actual_size * 2}`;
+  // Nếu url ảnh hiện tại đã là ảnh mặc định rồi thì dừng lại để tránh lặp vô hạn
+  if (image.src.includes("1111111111")) {
+    return;
+  }
+  /** Đường dẫn ảnh mặc định fallback */
+  const FALLBACK_SRC =
+    "https://chatbox-static-v3.botbanhang.vn/app/facebook/avatar/1111111111?width=64&height=64";
+  // Gán lại src của ảnh bằng đường dẫn mặc định
+  image.src = FALLBACK_SRC;
 }
 
 class Main {

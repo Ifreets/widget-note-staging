@@ -70,7 +70,7 @@ export interface ICdn {
   webMessageMedia(
     page_id?: string,
     message_id?: string,
-    index?: number
+    index?: number,
   ): string;
   /**
    * đường dẫn media của message
@@ -81,7 +81,7 @@ export interface ICdn {
   tiktokMessageMedia(
     page_id?: string,
     message_id?: string,
-    index?: number
+    index?: number,
   ): string;
   /**
    * đường dẫn media của message
@@ -92,7 +92,7 @@ export interface ICdn {
   zaloMessageMedia(
     page_id?: string,
     message_id?: string,
-    index?: number
+    index?: number,
   ): string;
   /**
    * đường dẫn ảnh đại diện của page zalo
@@ -107,7 +107,10 @@ export interface ICdn {
 @singleton()
 export class Cdn implements ICdn {
   /**Host media cdn */
-  constructor(private readonly HOST = import.meta.env.VITE_MEIDA_CDN) {}
+  constructor(
+    private readonly HOST = $env.VITE_MEDIA_CDN ||
+      import.meta.env.VITE_MEDIA_CDN,
+  ) {}
 
   fbPageAvt(page_id?: string) {
     return `${this.HOST}/media/fb/${page_id}/page`;

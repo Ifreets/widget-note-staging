@@ -1,9 +1,11 @@
 /** kiểu dữ liệu của biến môi trường */
 export interface Env {
   /** key bí mật của widget */
-  secret_key: string
+  secret_key: string;
   /** domain call api merchant */
-  merchant: string
+  merchant: string;
   /** domain call api contact */
-  contact: string
+  contact: string;
+  /** domain call api media */
+  VITE_MEDIA_CDN?: string;
 }
