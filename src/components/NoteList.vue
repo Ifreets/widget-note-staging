@@ -5,7 +5,7 @@
   <!-- Danh sách ghi chú khi không loading -->
   <div
     v-else
-    class="body-schedule-list h-full overflow-hidden overflow-y-auto scrollbar-thin flex flex-col gap-2 overscroll-contain"
+    class="body-schedule-list h-full overflow-hidden overflow-y-auto scrollbar-thin flex flex-col gap-2 overscroll-none"
   >
     <div
       class="px-3 py-2 flex flex-col gap-1 bg-slate-100 w-[99%] rounded-lg font-medium text-sm cursor-pointer hover:bg-slate-200"
